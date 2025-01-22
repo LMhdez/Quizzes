@@ -1,0 +1,2891 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>ReactSussy</title>
+	<style>
+		.hidden {
+			display: none;
+		}
+
+		#refreshHeader {
+			cursor: pointer;
+			color: #007BFF;
+			text-decoration: underline;
+		}
+
+		#refreshHeader:hover {
+			color: #0056b3;
+		}
+
+		:root {
+			--bg-color: #121212;
+			--card-color: #1f1f1f;
+			--accent-color: #4caf50;
+			--error-color: #f44336;
+			--text-color: #e0e0e0;
+			--button-hover: #333;
+			--transition-time: 0.3s;
+		}
+
+		input[type="text"],
+		select {
+			padding: 0.8rem;
+			font-size: 1rem;
+			border: 1px solid var(--button-hover);
+			border-radius: 8px;
+			background-color: var(--card-color);
+			color: var(--text-color);
+			outline: none;
+			transition: border-color var(--transition-time),
+				box-shadow var(--transition-time);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		}
+
+		input[type="text"]:focus,
+		select:focus {
+			border-color: var(--accent-color);
+			box-shadow: 0 0 6px var(--accent-color);
+		}
+
+		input[type="text"]::placeholder {
+			color: rgba(224, 224, 224, 0.7);
+			font-style: italic;
+		}
+
+		body {
+			font-family: "Roboto", sans-serif;
+			margin: 0;
+			padding: 0;
+			background-color: var(--bg-color);
+			color: var(--text-color);
+			overflow-x: hidden;
+		}
+
+		header {
+			background-color: var(--card-color);
+			color: var(--text-color);
+			padding: 1.5rem 1rem;
+			text-align: center;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+			position: sticky;
+			top: 0;
+			z-index: 1000;
+		}
+
+		main {
+			padding: 1rem;
+			max-width: 900px;
+			margin: 2rem auto;
+			animation: fadeIn var(--transition-time) ease-in-out;
+		}
+
+		.menu,
+		.options,
+		.list {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			margin-top: 2rem;
+		}
+
+		button {
+			padding: 0.8rem;
+			font-size: 1rem;
+			border: none;
+			border-radius: 8px;
+			cursor: pointer;
+			background-color: var(--card-color);
+			color: var(--text-color);
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+			transition: transform var(--transition-time),
+				background-color var(--transition-time);
+		}
+
+		button:hover {
+			transform: translateY(-2px);
+			background-color: var(--button-hover);
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.question {
+			margin-bottom: 1.5rem;
+			font-size: 1.2rem;
+			text-align: center;
+			background-color: var(--card-color);
+			padding: 1rem;
+			border-radius: 8px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+		}
+
+		.feedback {
+			margin-top: 1.5rem;
+			padding: 1rem;
+			text-align: center;
+			font-size: 1rem;
+			border-radius: 8px;
+			transition: background-color var(--transition-time),
+				color var(--transition-time);
+		}
+
+		.feedback.correct {
+			background-color: var(--accent-color);
+			color: #ffffff;
+		}
+
+		.feedback.wrong {
+			background-color: var(--error-color);
+			color: #ffffff;
+		}
+
+		input[type="text"] {
+			padding: 0.8rem;
+			background-color: var(--card-color);
+			color: var(--text-color);
+			border: 1px solid var(--button-hover);
+			border-radius: 8px;
+			outline: none;
+			font-size: 1rem;
+			transition: border-color var(--transition-time);
+		}
+
+		input[type="text"]:focus {
+			border-color: var(--accent-color);
+		}
+
+		.option.correct {
+			background-color: var(--accent-color);
+		}
+
+		.option.wrong {
+			background-color: var(--error-color);
+		}
+
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		@keyframes slideIn {
+			from {
+				opacity: 0;
+				transform: translateX(-100%);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<header id="header">
+		<h1 id="refreshHeader">ReactSussy</h1>
+	</header>
+	<main>
+		<div id="menu" class="menu">
+			<button id="randomButton" onclick="startGame('random')" disabled>
+				Perguntas Aleatórias
+			</button>
+			<button id="unseenButton" onclick="startGame('unseen')" disabled>
+				Perguntas Novas
+			</button>
+			<button id="infiniteButton" onclick="startGame('infinite')" disabled>
+				Perguntas Infinitas
+			</button>
+			<label>
+				Número de perguntas:
+				<select id="questionCount">
+					<option value="" selected disabled>
+						Selecione o número de perguntas
+					</option>
+					<option value="10">10</option>
+					<option value="30">30</option>
+					<option value="60">60</option>
+					<option value="90">90</option>
+				</select>
+			</label>
+			<p id="estimatedTime">Tempo estimado: -</p>
+			<span id="selectionWarning" style="color: red; display: block">Selecione o número de perguntas para começar
+				o jogo.</span>
+			<button onclick="listQuestions()">
+				Listar Todas as Perguntas
+			</button>
+			<button onclick="showProfile()">Perfil</button>
+		</div>
+
+		<div id="game" class="hidden">
+			<div id="question" class="question"></div>
+			<div id="options" class="options"></div>
+			<div id="feedback" class="feedback hidden"></div>
+			<p id="reference" class="hidden"></p>
+			<button id="next" class="hidden" onclick="nextQuestion()">
+				Próxima Pergunta
+			</button>
+		</div>
+
+		<div id="results" class="hidden">
+			<h2>Resultados</h2>
+			<p id="score"></p>
+			<p id="timeStats"></p>
+			<button onclick="resetGame()">Voltar ao Menu</button>
+		</div>
+
+		<div id="list" class="hidden">
+			<h2>Lista de Perguntas</h2>
+			<div class="search-bar">
+				<input type="text" id="search" placeholder="Pesquisar perguntas" oninput="filterQuestions()" />
+			</div>
+			<div id="questionsList" class="list"></div>
+			<button onclick="resetGame()">Voltar ao Menu</button>
+		</div>
+
+		<div id="profile" class="hidden">
+			<h2>Perfil do Jogador</h2>
+			<p id="averageTime">Tempo médio de resposta: -</p>
+			<p id="totalTests">Total de testes realizados: -</p>
+			<p id="randomTests">Testes aleatórios: -</p>
+			<p id="unseenTests">Testes de perguntas novas: -</p>
+			<p id="infiniteTests">Testes infinitos: -</p>
+			<p id="seenQuestions">Perguntas vistas: -</p>
+			<p id="unseenQuestions">Perguntas por ver: -</p>
+			<p id="availableQuestions">Perguntas disponíveis: -</p>
+			<button onclick="resetGame()">Voltar ao Menu</button>
+		</div>
+	</main>
+
+	<script>
+		let questions = [
+			{
+				question: "O que é JSX no React?",
+				options: [
+					"Uma extensão de sintaxe para JavaScript",
+					"Uma biblioteca de estilo",
+					"Uma ferramenta de build",
+					"Um compilador",
+				],
+				answer: 0,
+				explanation:
+					"JSX é uma extensão de sintaxe que permite escrever código semelhante a HTML dentro de JavaScript.",
+				reference: "Aula 2 - Introdução ao React",
+				seen: false,
+			},
+			{
+				question: "Qual é o objetivo do hook useEffect?",
+				options: [
+					"Manipular o DOM diretamente",
+					"Executar efeitos colaterais em componentes",
+					"Criar componentes reutilizáveis",
+					"Definir estados iniciais",
+				],
+				answer: 1,
+				explanation:
+					"O hook useEffect é usado para gerir efeitos colaterais, como chamadas de API ou subscrições.",
+				reference: "Aula 6 - Hooks em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das opções descreve corretamente a função do React Router?",
+				options: [
+					"Gerir estados de componentes",
+					"Criar estilos dinâmicos em CSS",
+					"Definir e gerir rotas na aplicação",
+					"Executar efeitos colaterais",
+				],
+				answer: 2,
+				explanation:
+					"O React Router é usado para definir e gerir rotas em aplicações React.",
+				reference: "Aula 6 - React Router",
+				seen: false,
+			},
+			{
+				question:
+					"O que significa o operador spread em JavaScript?",
+				options: [
+					"Permitir criar uma cópia de um array ou objeto",
+					"Combinar dois arrays em um",
+					"Destruir propriedades de objetos",
+					"Declarar variáveis no escopo global",
+				],
+				answer: 0,
+				explanation:
+					"O operador spread permite criar uma cópia de arrays ou objetos, mantendo imutabilidade.",
+				reference: "Aula 4 - Spread e Rest Operators",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das seguintes é uma característica do SASS/SCSS?",
+				options: [
+					"Não suporta variáveis",
+					"Permite o uso de mixins e partials",
+					"É uma alternativa ao HTML",
+					"Requer JavaScript para funcionar",
+				],
+				answer: 1,
+				explanation:
+					"O SASS/SCSS suporta funcionalidades avançadas, como mixins e partials.",
+				reference: "Aula 13 - SASS/SCSS",
+				seen: false,
+			},
+			{
+				question:
+					"O que significa o termo 'Desktop First' no desenvolvimento de layouts?",
+				options: [
+					"Criar layouts responsivos começando pelo desktop",
+					"Priorizar dispositivos móveis",
+					"Definir o design sem media queries",
+					"Criar apenas versões desktop da aplicação",
+				],
+				answer: 0,
+				explanation:
+					"Desktop First refere-se ao desenvolvimento de layouts que começam pelo design para desktop.",
+				reference: "Aula 11 - HTML/CSS Responsivo",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a função principal do hook useState em React?",
+				options: [
+					"Criar rotas dinâmicas",
+					"Gerir o estado interno de um componente",
+					"Executar código após renderização",
+					"Gerir eventos do DOM",
+				],
+				answer: 1,
+				explanation:
+					"O hook useState é usado para criar e gerir estados em componentes React.",
+				reference: "Aula 3 - Estado em Componentes",
+				seen: false,
+			},
+			{
+				question:
+					"Qual comando é usado para compilar código React com Babel?",
+				options: [
+					"npm start",
+					"npx babel src/app.js -o public/scripts/app.js --presets=@babel/preset-react",
+					"npm install react",
+					"node app.js",
+				],
+				answer: 1,
+				explanation:
+					"O comando compila o código React usando Babel com o preset apropriado.",
+				reference: "Setup.txt - Comandos para Babel",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das seguintes declarações é válida para criar um componente funcional em React?",
+				options: [
+					"function MeuComponente() { return <div>Olá</div>; }",
+					"componente MeuComponente = () => { <div>Olá</div>; }",
+					"new Component MeuComponente { return <div>Olá</div>; }",
+					"function MeuComponente { return <div>Olá</div>; }",
+				],
+				answer: 0,
+				explanation:
+					"Um componente funcional é uma função que retorna JSX, como mostrado na primeira opção.",
+				reference: "Aula 3 - Componentes Funcionais",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das opções NÃO é uma funcionalidade do SASS/SCSS?",
+				options: [
+					"Uso de mixins",
+					"Variáveis para estilos dinâmicos",
+					"Herança de seletores",
+					"Manipulação do DOM",
+				],
+				answer: 3,
+				explanation:
+					"O SASS/SCSS não interage com o DOM, pois é uma extensão de CSS.",
+				reference: "Aula 13 - SASS/SCSS",
+				seen: false,
+			},
+			{
+				question: "O que são props em React?",
+				options: [
+					"Variáveis globais usadas em toda a aplicação",
+					"Parâmetros passados para componentes",
+					"Hooks para gerir o estado",
+					"Métodos para manipular o DOM",
+				],
+				answer: 1,
+				explanation:
+					"Props são parâmetros passados para componentes para partilhar dados.",
+				reference: "Aula 3 - Props em React",
+				seen: false,
+			},
+			{
+				question: "Qual é a vantagem do uso de hooks no React?",
+				options: [
+					"Permitir a manipulação direta do DOM",
+					"Adicionar estado e ciclos de vida em componentes funcionais",
+					"Evitar o uso de JSX",
+					"Garantir que apenas componentes de classe sejam usados",
+				],
+				answer: 1,
+				explanation:
+					"Hooks permitem adicionar estado e ciclos de vida a componentes funcionais.",
+				reference: "Aula 6 - Hooks em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o resultado esperado ao usar o operador rest em uma função?",
+				options: [
+					"Receber múltiplos argumentos como um array",
+					"Criar uma cópia de um array ou objeto",
+					"Remover propriedades de um objeto",
+					"Definir valores padrão para argumentos",
+				],
+				answer: 0,
+				explanation:
+					"O operador rest coleta múltiplos argumentos em um único array.",
+				reference: "Aula 4 - Spread e Rest Operators",
+				seen: false,
+			},
+			{
+				question: "O que o comando 'npx babel' faz?",
+				options: [
+					"Compila código React e ES6 para JavaScript compatível com o navegador",
+					"Inicia o servidor de desenvolvimento",
+					"Instala pacotes do Babel",
+					"Configura o ambiente de desenvolvimento",
+				],
+				answer: 0,
+				explanation:
+					"O comando 'npx babel' é usado para compilar código React e ES6 para JavaScript compatível com navegadores.",
+				reference: "Commands.txt - Comandos Babel",
+				seen: false,
+			},
+			{
+				question: "O que significa usar 'props.children' em React?",
+				options: [
+					"Acessar os estados filhos do componente",
+					"Renderizar o conteúdo filho passado para um componente",
+					"Definir variáveis locais dentro de um componente",
+					"Gerir eventos de clique nos filhos do componente",
+				],
+				answer: 1,
+				explanation:
+					"'props.children' permite renderizar o conteúdo filho passado para um componente.",
+				reference: "Aula 6 - Props Children",
+				seen: false,
+			},
+			{
+				question: "O que é um componente controlado em React?",
+				options: [
+					"Um componente que usa o estado interno para gerir inputs",
+					"Um componente que não tem acesso a props",
+					"Um componente que depende de bibliotecas externas",
+					"Um componente que usa classes para renderização",
+				],
+				answer: 0,
+				explanation:
+					"Componentes controlados usam o estado interno para gerir inputs e comportamentos.",
+				reference: "Aula 8 - Formulários em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o principal benefício de usar mixins no SASS/SCSS?",
+				options: [
+					"Reduzir o uso de media queries",
+					"Facilitar a reutilização de blocos de estilos",
+					"Definir variáveis globais",
+					"Eliminar código CSS desnecessário",
+				],
+				answer: 1,
+				explanation:
+					"Mixins permitem a reutilização de blocos de estilos, reduzindo redundâncias.",
+				reference: "Aula 14 - Mixins no SASS",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a ordem correta dos estados de um componente React?",
+				options: [
+					"Montagem, Atualização, Desmontagem",
+					"Atualização, Montagem, Desmontagem",
+					"Montagem, Desmontagem, Atualização",
+					"Desmontagem, Atualização, Montagem",
+				],
+				answer: 0,
+				explanation:
+					"Os estados de um componente React são Montagem, Atualização e Desmontagem.",
+				reference: "Aula 6 - Ciclo de Vida de Componentes",
+				seen: false,
+			},
+			{
+				question: "O que é 'state lifting' em React?",
+				options: [
+					"Passar dados para componentes filhos através de props",
+					"Mover o estado para o componente pai para partilhá-lo entre filhos",
+					"Remover o estado de um componente funcional",
+					"Adicionar hooks a componentes de classe",
+				],
+				answer: 1,
+				explanation:
+					"'State lifting' move o estado para o componente pai para partilhá-lo entre componentes filhos.",
+				reference: "Aula 3 - Estado em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual destas práticas melhora a performance de aplicações React?",
+				options: [
+					"Usar o método setInterval em cada renderização",
+					"Evitar o uso de hooks",
+					"Memorizar componentes e funções com React.memo e useCallback",
+					"Renderizar todo o DOM sempre que possível",
+				],
+				answer: 2,
+				explanation:
+					"Memorizar componentes e funções ajuda a evitar renderizações desnecessárias.",
+				reference: "Aula 8 - Performance em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a função principal do Babel em um projeto React?",
+				options: [
+					"Compilar JSX para JavaScript compatível com navegadores",
+					"Gerir pacotes npm",
+					"Renderizar componentes no DOM",
+					"Estilizar componentes com CSS",
+				],
+				answer: 0,
+				explanation:
+					"Babel compila o código JSX para JavaScript compatível com navegadores.",
+				reference: "Commands.txt - Babel",
+				seen: false,
+			},
+			{
+				question:
+					"O que significa 'component-based architecture' no React?",
+				options: [
+					"Desenvolver interfaces separando o código por funções",
+					"Criar aplicações web sem necessidade de servidor",
+					"Construir aplicações divididas em blocos reutilizáveis",
+					"Gerir o estado de forma global na aplicação",
+				],
+				answer: 2,
+				explanation:
+					"React utiliza uma arquitetura baseada em componentes para criar blocos reutilizáveis.",
+				reference: "Aula 3 - Componentes no React",
+				seen: false,
+			},
+			{
+				question:
+					"Como se define um estado inicial com useState em React?",
+				options: [
+					"const [state, setState] = useState(valorInicial)",
+					"const state = React.use(valorInicial)",
+					"state(valorInicial) => React.useState",
+					"setState = new useState(valorInicial)",
+				],
+				answer: 0,
+				explanation:
+					"O hook useState define o estado inicial como mostrado na primeira opção.",
+				reference: "Aula 3 - useState",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a sintaxe correta para passar props para um componente?",
+				options: [
+					"<MeuComponente nome='React' />",
+					"<MeuComponente {nome: 'React'} />",
+					"MeuComponente({nome: 'React'})",
+					"props.MeuComponente(nome='React')",
+				],
+				answer: 0,
+				explanation:
+					"A sintaxe correta para passar props é usar atributos HTML, como mostrado.",
+				reference: "Aula 3 - Props em React",
+				seen: false,
+			},
+			{
+				question:
+					"O que significa o conceito 'imutable state' em React?",
+				options: [
+					"Manter o estado inalterado durante toda a aplicação",
+					"Alterar o estado apenas através da função setState",
+					"Proteger o estado de eventos do DOM",
+					"Gerir o estado globalmente sem alterações",
+				],
+				answer: 1,
+				explanation:
+					"O estado em React é imutável, sendo alterado apenas com funções específicas.",
+				reference: "Aula 3 - Imutabilidade do Estado",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o propósito do método render() em componentes de classe?",
+				options: [
+					"Atualizar o estado do componente",
+					"Definir as props do componente",
+					"Renderizar o conteúdo do componente na interface",
+					"Gerir eventos do ciclo de vida",
+				],
+				answer: 2,
+				explanation:
+					"O método render() é usado para definir o conteúdo que será exibido na interface.",
+				reference: "Aula 2 - Componentes de Classe",
+				seen: false,
+			},
+			{
+				question:
+					"O que é necessário para usar 'useParams' no React Router?",
+				options: [
+					"Declarar o hook diretamente dentro de um componente",
+					"Configurar rotas usando Route e definir parâmetros na rota",
+					"Instalar pacotes adicionais como react-router-redux",
+					"Usar apenas componentes de classe",
+				],
+				answer: 1,
+				explanation:
+					"Para usar 'useParams', é necessário definir parâmetros na configuração de rotas.",
+				reference: "Aula 7 - React Router",
+				seen: false,
+			},
+
+			{
+				question: "O que é a diretiva @each no SASS?",
+				options: [
+					"Permitir iterar sobre listas ou mapas",
+					"Definir variáveis globais",
+					"Criar mixins reutilizáveis",
+					"Importar ficheiros CSS externos",
+				],
+				answer: 0,
+				explanation:
+					"A diretiva @each é usada para iterar sobre listas ou mapas em SASS.",
+				reference: "Aula 13 - SCSS Funcionalidades",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a principal diferença entre o SASS e o SCSS?",
+				options: [
+					"SCSS é uma sintaxe mais semelhante ao CSS",
+					"SASS suporta variáveis e SCSS não",
+					"SCSS não permite aninhar seletores",
+					"SASS foi criado após o SCSS",
+				],
+				answer: 0,
+				explanation:
+					"SCSS tem uma sintaxe mais próxima do CSS, enquanto SASS usa uma sintaxe mais concisa.",
+				reference: "Aula 12 - SASS vs SCSS",
+				seen: false,
+			},
+			{
+				question: "Como funciona o método map() em JavaScript?",
+				options: [
+					"Itera sobre arrays e retorna um novo array",
+					"Modifica diretamente os elementos do array original",
+					"Filtra os elementos de um array",
+					"Itera sobre arrays sem retornar um valor",
+				],
+				answer: 0,
+				explanation:
+					"O método map() cria um novo array com os resultados de aplicar uma função a cada elemento.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question: "O que significa 'lifting state up' em React?",
+				options: [
+					"Mover o estado para o componente pai para partilhá-lo entre filhos",
+					"Reduzir o número de hooks no componente",
+					"Criar estados locais para evitar duplicação de dados",
+					"Gerir estados globais com Redux",
+				],
+				answer: 0,
+				explanation:
+					"'Lifting state up' refere-se a mover o estado para o componente pai para partilhar dados.",
+				reference: "Aula 3 - Lifting State Up",
+				seen: false,
+			},
+			{
+				question:
+					"O que significa o termo 'destructuring' em JavaScript?",
+				options: [
+					"Extrair valores de arrays ou objetos para variáveis",
+					"Remover propriedades de objetos",
+					"Criar novas instâncias de objetos",
+					"Combinar múltiplos arrays ou objetos",
+				],
+				answer: 0,
+				explanation:
+					"Destructuring permite extrair valores de arrays ou objetos e atribuí-los a variáveis.",
+				reference: "Aula 4 - Destructuring",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o resultado de uma operação com o operador spread em um array?",
+				options: [
+					"Cria uma cópia do array",
+					"Adiciona novos elementos ao array",
+					"Remove elementos duplicados do array",
+					"Filtra elementos de acordo com uma condição",
+				],
+				answer: 0,
+				explanation:
+					"O operador spread cria uma cópia do array ou expande seus elementos.",
+				reference: "Aula 4 - Spread Operator",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das opções descreve corretamente a diretiva @import no SASS?",
+				options: [
+					"Permite importar ficheiros CSS ou SCSS para reutilização de estilos",
+					"Define mixins reutilizáveis",
+					"Cria variáveis globais no projeto",
+					"Adiciona estilos diretamente no DOM",
+				],
+				answer: 0,
+				explanation:
+					"A diretiva @import é usada para importar ficheiros SCSS ou CSS no SASS.",
+				reference: "Aula 14 - Diretiva @import",
+				seen: false,
+			},
+			{
+				question: "O que é uma função pura em JavaScript?",
+				options: [
+					"Uma função que não depende nem altera variáveis externas",
+					"Uma função que altera diretamente o estado global",
+					"Uma função que é usada apenas com números",
+					"Uma função que retorna sempre um valor aleatório",
+				],
+				answer: 0,
+				explanation:
+					"Uma função pura não altera o estado externo nem depende de variáveis externas.",
+				reference: "Aula 5 - Funções em JavaScript",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o principal benefício de usar props.children em React?",
+				options: [
+					"Permitir que um componente renderize conteúdo dinâmico passado como filhos",
+					"Definir o estado inicial de um componente",
+					"Criar hooks personalizados",
+					"Gerir rotas em componentes filhos",
+				],
+				answer: 0,
+				explanation:
+					"'props.children' permite renderizar dinamicamente o conteúdo passado para um componente.",
+				reference: "Aula 6 - Props Children",
+				seen: false,
+			},
+
+
+			{
+				question:
+					"Qual das opções não é uma vantagem do uso de variáveis no SCSS?",
+				options: [
+					"Facilitar a alteração de valores globais",
+					"Permitir reutilização de valores em diferentes partes do código",
+					"Melhorar a organização do código",
+					"Alterar dinamicamente o valor das variáveis no runtime",
+				],
+				answer: 3,
+				explanation:
+					"As variáveis do SCSS são compiladas e não podem ser alteradas em runtime.",
+				reference: "Aula 13 - SCSS Variáveis",
+				seen: false,
+			},
+			{
+				question: "Como se utiliza o hook useContext em React?",
+				options: [
+					"Para aceder a um estado global gerido pelo Context API",
+					"Para declarar variáveis globais",
+					"Para criar rotas dinâmicas na aplicação",
+					"Para gerir o ciclo de vida do componente",
+				],
+				answer: 0,
+				explanation:
+					"O hook useContext é usado para aceder ao estado global fornecido pelo Context API.",
+				reference: "Aula 6 - Context API",
+				seen: false,
+			},
+			{
+				question:
+					"O que acontece se não for passada uma chave única (key) ao renderizar uma lista em React?",
+				options: [
+					"O React não consegue identificar alterações nos elementos da lista",
+					"O React lança um erro e impede a renderização",
+					"A lista é renderizada apenas no lado do servidor",
+					"Os elementos da lista são convertidos em strings",
+				],
+				answer: 0,
+				explanation:
+					"As chaves ajudam o React a identificar quais itens foram alterados, adicionados ou removidos.",
+				reference: "Aula 3 - Listas em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a funcionalidade do método filter() em JavaScript?",
+				options: [
+					"Criar um novo array com os elementos que atendem a uma condição",
+					"Alterar diretamente os elementos de um array",
+					"Iterar sobre elementos e retornar o índice",
+					"Dividir um array em múltiplos arrays",
+				],
+				answer: 0,
+				explanation:
+					"O método filter() retorna um novo array com elementos que satisfazem uma condição.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das opções descreve corretamente o uso de useRef em React?",
+				options: [
+					"Criar uma referência mutável que persiste durante o ciclo de vida do componente",
+					"Definir estados iniciais em componentes funcionais",
+					"Substituir o uso de useEffect",
+					"Gerir eventos de clique em elementos do DOM",
+				],
+				answer: 0,
+				explanation:
+					"useRef é usado para criar referências mutáveis que não causam novas renderizações.",
+				reference: "Aula 6 - Hooks Avançados",
+				seen: false,
+			},
+			{
+				question:
+					"O que acontece quando se usa o método setState em um componente de classe React?",
+				options: [
+					"Atualiza o estado e força uma nova renderização",
+					"Atualiza diretamente o DOM",
+					"Remove o estado antigo e substitui pelo novo",
+					"Cria uma cópia do estado anterior",
+				],
+				answer: 0,
+				explanation:
+					"setState atualiza o estado do componente e provoca uma nova renderização.",
+				reference: "Aula 2 - Componentes de Classe",
+				seen: false,
+			},
+			{
+				question:
+					"Como se define uma função assíncrona em JavaScript?",
+				options: [
+					"Usando a palavra-chave async antes da função",
+					"Usando a palavra-chave await antes da função",
+					"Declarando a função dentro de um setTimeout",
+					"Usando promessas em todas as chamadas internas",
+				],
+				answer: 0,
+				explanation:
+					"A palavra-chave async é usada para declarar funções assíncronas.",
+				reference: "Aula 5 - JavaScript Assíncrono",
+				seen: false,
+			},
+			{
+				question: "O que é o Context API em React?",
+				options: [
+					"Uma forma de partilhar dados globalmente entre componentes",
+					"Uma biblioteca externa para gerir o estado",
+					"Um hook que substitui o useState",
+					"Uma abordagem para criar rotas dinâmicas",
+				],
+				answer: 0,
+				explanation:
+					"O Context API é usado para partilhar dados entre componentes sem necessidade de props drilling.",
+				reference: "Aula 6 - Context API",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a diferença entre o método forEach e o map em JavaScript?",
+				options: [
+					"forEach não retorna um novo array, enquanto map retorna",
+					"forEach só funciona em objetos, enquanto map funciona em arrays",
+					"map é mais rápido do que forEach",
+					"forEach pode ser interrompido com break, enquanto map não pode",
+				],
+				answer: 0,
+				explanation:
+					"forEach não retorna um novo array, enquanto map cria e retorna um novo array.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question: "Como os media queries são usadas no CSS?",
+				options: [
+					"Para aplicar estilos específicos com base no tamanho da tela ou dispositivo",
+					"Para criar animações CSS",
+					"Para importar ficheiros externos",
+					"Para alterar o DOM diretamente",
+				],
+				answer: 0,
+				explanation:
+					"As media queries permitem aplicar estilos diferentes com base no tamanho da tela ou dispositivo.",
+				reference: "Aula 11 - CSS Responsivo",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das seguintes funcionalidades é exclusiva do SCSS em comparação com o CSS padrão?",
+				options: [
+					"Aninhamento de seletores",
+					"Definição de cores com palavras-chave",
+					"Criação de estilos responsivos",
+					"Uso de propriedades CSS padrão",
+				],
+				answer: 0,
+				explanation:
+					"O SCSS permite aninhar seletores, o que não é possível no CSS padrão.",
+				reference: "Aula 12 - SCSS Funcionalidades",
+				seen: false,
+			},
+			{
+				question: "O que é um 'controlled component' em React?",
+				options: [
+					"Um componente cujo valor é controlado pelo estado React",
+					"Um componente que não possui estado interno",
+					"Um componente que só pode ser usado com hooks",
+					"Um componente que não renderiza no lado do servidor",
+				],
+				answer: 0,
+				explanation:
+					"Um 'controlled component' é controlado pelo estado React, como em formulários.",
+				reference: "Aula 8 - Formulários React",
+				seen: false,
+			},
+
+			{
+				question: "Qual é a função de um mixin no SASS?",
+				options: [
+					"Reutilizar blocos de código estilístico em diferentes partes do projeto",
+					"Definir variáveis globais",
+					"Criar seletores aninhados automaticamente",
+					"Aplicar estilos responsivos sem media queries",
+				],
+				answer: 0,
+				explanation:
+					"Mixins permitem reutilizar blocos de código, evitando redundância.",
+				reference: "Aula 14 - Mixins em SCSS",
+				seen: false,
+			},
+			{
+				question: "O que é o atributo 'key' no React?",
+				options: [
+					"Um identificador único usado ao renderizar listas",
+					"Uma função para gerir eventos de teclado",
+					"Um identificador global para estados",
+					"Um atributo obrigatório para componentes de classe",
+				],
+				answer: 0,
+				explanation:
+					"O atributo 'key' ajuda o React a identificar e gerir itens únicos em listas.",
+				reference: "Aula 3 - Listas em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a função da propriedade justify-content no CSS?",
+				options: [
+					"Alinhar elementos horizontalmente em um contêiner flexível",
+					"Alinhar elementos verticalmente em um contêiner flexível",
+					"Criar uma borda ao redor de elementos",
+					"Aplicar espaçamento interno nos elementos",
+				],
+				answer: 0,
+				explanation:
+					"justify-content alinha os elementos horizontalmente em um contêiner flexível.",
+				reference: "Aula 11 - CSS Flexbox",
+				seen: false,
+			},
+			{
+				question: "O que é o método push() em JavaScript?",
+				options: [
+					"Adiciona novos elementos ao final de um array",
+					"Remove o último elemento de um array",
+					"Adiciona novos elementos ao início de um array",
+					"Remove o primeiro elemento de um array",
+				],
+				answer: 0,
+				explanation:
+					"push() adiciona novos elementos ao final de um array.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das opções descreve corretamente o hook useCallback em React?",
+				options: [
+					"Memoriza uma função para evitar sua recriação em cada renderização",
+					"É usado para gerir referências a elementos DOM",
+					"Cria estados complexos no componente",
+					"Permite alternar entre estados diferentes",
+				],
+				answer: 0,
+				explanation:
+					"useCallback memoriza uma função para evitar sua recriação desnecessária.",
+				reference: "Aula 8 - Hooks Avançados",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o propósito do método preventDefault em eventos JavaScript?",
+				options: [
+					"Evitar o comportamento padrão de um evento",
+					"Cancelar a propagação de um evento para elementos pai",
+					"Substituir o comportamento padrão do navegador",
+					"Definir um evento como global",
+				],
+				answer: 0,
+				explanation:
+					"preventDefault impede que o comportamento padrão de um evento ocorra.",
+				reference: "Aula 3 - Eventos em React",
+				seen: false,
+			},
+			{
+				question: "Como o operador rest é utilizado em JavaScript?",
+				options: [
+					"Para coletar múltiplos argumentos em uma única variável",
+					"Para copiar propriedades de um objeto",
+					"Para remover elementos de um array",
+					"Para dividir strings em arrays",
+				],
+				answer: 0,
+				explanation:
+					"O operador rest coleta múltiplos argumentos e os armazena como um array.",
+				reference: "Aula 4 - Operadores Spread e Rest",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das opções descreve corretamente o conceito de virtual DOM em React?",
+				options: [
+					"Uma representação leve do DOM real usada para melhorar a performance",
+					"Uma ferramenta para criar componentes dinâmicos",
+					"Um algoritmo para renderizar CSS em tempo real",
+					"Uma extensão do DOM usada apenas em servidores",
+				],
+				answer: 0,
+				explanation:
+					"O virtual DOM é uma representação leve do DOM real que otimiza a renderização.",
+				reference: "Aula 2 - Virtual DOM",
+				seen: false,
+			},
+
+			{
+				question:
+					"O que acontece se o método setState for chamado diretamente em um componente de classe?",
+				options: [
+					"O estado é atualizado e o componente re-renderizado",
+					"Um erro é lançado e a execução é interrompida",
+					"O estado é alterado, mas o componente não é re-renderizado",
+					"O estado permanece inalterado",
+				],
+				answer: 0,
+				explanation:
+					"setState atualiza o estado e aciona uma nova renderização do componente.",
+				reference: "Aula 2 - Componentes de Classe",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a principal característica de um componente funcional em React?",
+				options: [
+					"Não possui estado próprio, mas pode usar hooks para gerir estados",
+					"Só pode ser usado para renderizar listas",
+					"Necessita de métodos de ciclo de vida",
+					"É obrigatório em todas as aplicações React",
+				],
+				answer: 0,
+				explanation:
+					"Componentes funcionais podem não ter estado, mas podem usar hooks para adicioná-lo.",
+				reference: "Aula 3 - Componentes Funcionais",
+				seen: false,
+			},
+			{
+				question:
+					"Como se declara um contexto usando o Context API no React?",
+				options: [
+					"const MeuContexto = React.createContext()",
+					"const MeuContexto = new Context()",
+					"const MeuContexto = React.useContext()",
+					"const MeuContexto = createContextAPI()",
+				],
+				answer: 0,
+				explanation:
+					"O método React.createContext() é usado para criar um contexto.",
+				reference: "Aula 6 - Context API",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o principal benefício do uso de CSS Modules?",
+				options: [
+					"Evitar conflitos de classes ao gerar nomes únicos automaticamente",
+					"Reduzir o tamanho do arquivo CSS",
+					"Criar estilos dinâmicos sem usar JavaScript",
+					"Adicionar suporte nativo para media queries",
+				],
+				answer: 0,
+				explanation:
+					"CSS Modules geram nomes únicos para evitar conflitos entre classes.",
+				reference: "Aula 11 - CSS Avançado",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a diferença entre o método find() e filter() em JavaScript?",
+				options: [
+					"find() retorna o primeiro elemento que atende à condição, enquanto filter() retorna todos os elementos",
+					"filter() retorna o índice do elemento, enquanto find() retorna o elemento em si",
+					"find() altera o array original, enquanto filter() cria um novo array",
+					"filter() é mais rápido do que find()",
+				],
+				answer: 0,
+				explanation:
+					"find() retorna o primeiro elemento que satisfaz a condição, enquanto filter() retorna todos.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"O que acontece se dois componentes React compartilharem o mesmo estado global sem o Context API?",
+				options: [
+					"Pode haver inconsistências ou duplicação de dados",
+					"O React automaticamente sincroniza os estados",
+					"Os componentes não conseguem aceder ao estado",
+					"Os componentes não renderizam corretamente",
+				],
+				answer: 0,
+				explanation:
+					"Sem o Context API, estados compartilhados podem causar inconsistências ou duplicações.",
+				reference: "Aula 6 - Context API",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a vantagem principal do uso de hooks em vez de componentes de classe?",
+				options: [
+					"Simplificar o código e permitir o uso de estado em componentes funcionais",
+					"Aumentar a performance de componentes grandes",
+					"Eliminar a necessidade de props",
+					"Substituir totalmente o uso do React Router",
+				],
+				answer: 0,
+				explanation:
+					"Hooks simplificam o código e permitem o uso de estado em componentes funcionais.",
+				reference: "Aula 6 - Hooks em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a sintaxe correta para definir um parâmetro opcional em JavaScript?",
+				options: [
+					"function minhaFuncao(param = 'valorPadrao')",
+					"function minhaFuncao(?param)",
+					"function minhaFuncao(param?)",
+					"function minhaFuncao(optional param)",
+				],
+				answer: 0,
+				explanation:
+					"Os parâmetros opcionais podem ser definidos com um valor padrão usando 'param = valorPadrao'.",
+				reference: "Aula 5 - JavaScript Moderno",
+				seen: false,
+			},
+
+			{
+				question: "O que é um Partial no SASS?",
+				options: [
+					"Um ficheiro SCSS que é importado por outros ficheiros e não é compilado diretamente",
+					"Um tipo especial de mixin que aceita variáveis",
+					"Uma diretiva para criar loops dentro do SCSS",
+					"Um arquivo CSS que é gerado automaticamente pelo compilador",
+				],
+				answer: 0,
+				explanation:
+					"Partials são ficheiros SCSS que começam com _ e são importados por outros ficheiros.",
+				reference: "Aula 14 - Partials no SASS",
+				seen: false,
+			},
+			{
+				question: "O que é a Context API no React?",
+				options: [
+					"Uma forma de partilhar dados globalmente sem passar props manualmente",
+					"Uma biblioteca externa para gerir estados",
+					"Uma extensão do React Router",
+					"Uma alternativa ao Redux",
+				],
+				answer: 0,
+				explanation:
+					"A Context API permite partilhar dados globalmente sem props drilling.",
+				reference: "Aula 6 - Context API",
+				seen: false,
+			},
+			{
+				question: "O que é um 'controlled input' em React?",
+				options: [
+					"Um elemento cujo valor é controlado pelo estado React",
+					"Um elemento que não permite alterações após renderização",
+					"Um input que só aceita valores numéricos",
+					"Um input gerido diretamente pelo DOM",
+				],
+				answer: 0,
+				explanation:
+					"Controlled inputs têm seu valor e comportamento geridos pelo estado React.",
+				reference: "Aula 8 - Formulários em React",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o propósito do método concat() em JavaScript?",
+				options: [
+					"Juntar dois ou mais arrays em um único array",
+					"Remover elementos duplicados de um array",
+					"Criar uma cópia inversa de um array",
+					"Filtrar elementos de um array",
+				],
+				answer: 0,
+				explanation:
+					"concat() é usado para juntar dois ou mais arrays, criando um novo array.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Como funciona o operador ternário em JavaScript?",
+				options: [
+					"É uma forma concisa de escrever condições if-else",
+					"Substitui a necessidade de funções anônimas",
+					"Permite manipular objetos com maior eficiência",
+					"Cria arrays dinâmicos com base em condições",
+				],
+				answer: 0,
+				explanation:
+					"O operador ternário é usado como uma forma concisa de escrever condições if-else.",
+				reference: "Aula 5 - JavaScript Moderno",
+				seen: false,
+			},
+			{
+				question:
+					"O que acontece quando se usa o método pop() em um array?",
+				options: [
+					"Remove o último elemento do array",
+					"Adiciona um elemento ao início do array",
+					"Remove o primeiro elemento do array",
+					"Adiciona um elemento ao final do array",
+				],
+				answer: 0,
+				explanation: "pop() remove o último elemento de um array.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question: "O que são fragments em React?",
+				options: [
+					"Uma forma de agrupar múltiplos elementos sem criar um nó adicional no DOM",
+					"Um tipo especial de componente funcional",
+					"Elementos que só podem ser usados em listas",
+					"Hooks avançados para gerir estados complexos",
+				],
+				answer: 0,
+				explanation:
+					"Fragments permitem agrupar elementos sem adicionar nós extras ao DOM.",
+				reference: "Aula 3 - Fragments em React",
+				seen: false,
+			},
+			{
+				question: "Qual é o propósito da diretiva @mixin no SASS?",
+				options: [
+					"Criar blocos reutilizáveis de código estilístico",
+					"Definir variáveis globais",
+					"Importar ficheiros CSS externos",
+					"Eliminar código duplicado automaticamente",
+				],
+				answer: 0,
+				explanation:
+					"Mixins são usados para criar blocos reutilizáveis de código no SASS.",
+				reference: "Aula 14 - Mixins no SASS",
+				seen: false,
+			},
+			{
+				question:
+					"Qual das opções descreve corretamente o conceito de 'props drilling' em React?",
+				options: [
+					"Passar dados de um componente pai para filhos, netos e assim por diante",
+					"Criar componentes funcionais com múltiplos estados",
+					"Renderizar elementos dinâmicos com base em props",
+					"Utilizar o Context API para gerir estados globais",
+				],
+				answer: 0,
+				explanation:
+					"Props drilling refere-se à passagem de dados de um componente pai para vários níveis de componentes filhos.",
+				reference: "Aula 6 - Context API",
+				seen: false,
+			},
+			{
+				question: "Como se utiliza o método slice() em JavaScript?",
+				options: [
+					"Para retornar uma cópia de uma parte de um array sem modificar o original",
+					"Para alterar diretamente os elementos do array",
+					"Para inverter a ordem dos elementos em um array",
+					"Para adicionar novos elementos ao início do array",
+				],
+				answer: 0,
+				explanation:
+					"slice() retorna uma cópia de parte de um array sem alterar o array original.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o papel do método render() em componentes de classe React?",
+				options: [
+					"Definir o que será exibido na interface",
+					"Gerir o estado do componente",
+					"Definir eventos do ciclo de vida",
+					"Manipular diretamente o DOM",
+				],
+				answer: 0,
+				explanation:
+					"O método render() especifica o que será exibido na interface.",
+				reference: "Aula 2 - Componentes de Classe",
+				seen: false,
+			},
+			{
+				question: "O que o método includes() faz em JavaScript?",
+				options: [
+					"Verifica se um array ou string contém um elemento ou sequência específica",
+					"Adiciona elementos ao array",
+					"Remove elementos duplicados de um array",
+					"Concatena dois arrays em um",
+				],
+				answer: 0,
+				explanation:
+					"includes() verifica se um elemento ou sequência específica está presente em um array ou string.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+
+			{
+				question:
+					"Qual é a funcionalidade do método reverse() em JavaScript?",
+				options: [
+					"Inverter a ordem dos elementos de um array",
+					"Ordenar os elementos de forma crescente",
+					"Remover o último elemento de um array",
+					"Copiar os elementos de um array para outro",
+				],
+				answer: 0,
+				explanation:
+					"reverse() inverte a ordem dos elementos em um array.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Como se define um componente de classe em React?",
+				options: [
+					"class MeuComponente extends React.Component { render() { return <div>Olá</div>; } }",
+					"function MeuComponente() { return <div>Olá</div>; }",
+					"React.createClass({ render() { return <div>Olá</div>; } })",
+					"let MeuComponente = React.Component { return <div>Olá</div>; }",
+				],
+				answer: 0,
+				explanation:
+					"Componentes de classe são definidos usando 'class' e extendem React.Component.",
+				reference: "Aula 2 - Componentes de Classe",
+				seen: false,
+			},
+			{
+				question:
+					"O que significa passar um callback para o setState em React?",
+				options: [
+					"Executar uma função assim que o estado é atualizado",
+					"Definir o estado inicial do componente",
+					"Alterar o estado de forma síncrona",
+					"Substituir o uso de useEffect",
+				],
+				answer: 0,
+				explanation:
+					"Passar um callback para setState permite executar lógica assim que o estado é atualizado.",
+				reference: "Aula 2 - Ciclo de Vida",
+				seen: false,
+			},
+
+			{
+				question:
+					"Qual é a função do hook useEffect com um array de dependências vazio?",
+				options: [
+					"Executar o efeito apenas uma vez após a renderização inicial",
+					"Executar o efeito toda vez que o componente é renderizado",
+					"Executar o efeito antes da renderização inicial",
+					"Evitar que o efeito seja executado",
+				],
+				answer: 0,
+				explanation:
+					"Com um array de dependências vazio, o useEffect é executado apenas uma vez após a renderização inicial.",
+				reference: "Aula 6 - Hooks em React",
+				seen: false,
+			},
+			{
+				question: "O que é uma arrow function em JavaScript?",
+				options: [
+					"Uma forma concisa de definir funções anônimas",
+					"Uma função que não aceita argumentos",
+					"Uma função usada apenas com objetos",
+					"Uma função que não pode retornar valores",
+				],
+				answer: 0,
+				explanation:
+					"Arrow functions são uma forma mais curta de escrever funções anônimas em JavaScript.",
+				reference: "Aula 5 - JavaScript Moderno",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o comportamento do método splice() em arrays JavaScript?",
+				options: [
+					"Adicionar, remover ou substituir elementos em um array",
+					"Retornar uma cópia de uma parte do array",
+					"Ordenar os elementos em ordem crescente",
+					"Inverter a ordem dos elementos no array",
+				],
+				answer: 0,
+				explanation:
+					"splice() permite adicionar, remover ou substituir elementos em um array.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o propósito do método sort() em JavaScript?",
+				options: [
+					"Ordenar os elementos de um array",
+					"Remover elementos duplicados de um array",
+					"Inverter a ordem dos elementos no array",
+					"Selecionar um elemento aleatório do array",
+				],
+				answer: 0,
+				explanation:
+					"sort() é usado para ordenar os elementos de um array, por padrão, em ordem crescente.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+
+			{
+				question: "O que significa 'lazy loading' em React?",
+				options: [
+					"Carregar componentes ou recursos apenas quando necessário",
+					"Renderizar todos os componentes antes da interação do usuário",
+					"Criar estados globais em uma aplicação",
+					"Manter o estado de um componente entre renderizações",
+				],
+				answer: 0,
+				explanation:
+					"'Lazy loading' permite carregar componentes ou recursos sob demanda, otimizando a performance.",
+				reference: "Aula 8 - Performance em React",
+				seen: false,
+			},
+
+			{
+				question: "O que é a 'state immutability' em React?",
+				options: [
+					"O estado nunca é modificado diretamente, mas sim substituído por uma cópia atualizada",
+					"O estado de um componente não pode ser alterado após ser definido",
+					"O estado só pode ser alterado por hooks específicos",
+					"Os estados em React são automaticamente sincronizados",
+				],
+				answer: 0,
+				explanation:
+					"Imutabilidade do estado significa que ele nunca é alterado diretamente, mas sim atualizado com uma cópia.",
+				reference: "Aula 3 - Estado em React",
+				seen: false,
+			},
+			{
+				question: "Como funciona a diretiva @extend no SASS?",
+				options: [
+					"Permite herdar estilos de outro seletor",
+					"Importa ficheiros CSS externos",
+					"Define variáveis reutilizáveis",
+					"Cria loops em código SCSS",
+				],
+				answer: 0,
+				explanation:
+					"@extend é usado para herdar estilos de outros seletores.",
+				reference: "Aula 14 - Diretiva @extend",
+				seen: false,
+			},
+			{
+				question:
+					"O que acontece quando um array é passado por referência em JavaScript?",
+				options: [
+					"Alterações no array original refletem na cópia",
+					"A cópia é completamente independente do original",
+					"Os valores do array são automaticamente imutáveis",
+					"Os métodos do array original não podem ser usados na cópia",
+				],
+				answer: 0,
+				explanation:
+					"Arrays em JavaScript são passados por referência, o que faz com que alterações no original afetem a cópia.",
+				reference: "Aula 5 - JavaScript Moderno",
+				seen: false,
+			},
+			{
+				question:
+					"Como o método map() em JavaScript difere de forEach()?",
+				options: [
+					"map() retorna um novo array, enquanto forEach() não retorna nada",
+					"forEach() é mais rápido do que map()",
+					"map() modifica o array original, enquanto forEach() não",
+					"forEach() é usado apenas com objetos",
+				],
+				answer: 0,
+				explanation:
+					"map() retorna um novo array baseado nos elementos originais, enquanto forEach() apenas itera.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"O que é um 'stateless functional component' em React?",
+				options: [
+					"Um componente funcional que não gere estado próprio",
+					"Um componente funcional que possui ciclo de vida",
+					"Um componente de classe que não gere estado",
+					"Um componente que só pode renderizar listas",
+				],
+				answer: 0,
+				explanation:
+					"Stateless functional components são funções simples que não têm estado próprio.",
+				reference: "Aula 3 - Componentes Funcionais",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a sintaxe correta para importar um módulo em JavaScript?",
+				options: [
+					"import meuModulo from './meuModulo.js'",
+					"require('./meuModulo.js')",
+					"include('./meuModulo.js')",
+					"load('./meuModulo.js')",
+				],
+				answer: 0,
+				explanation:
+					"A sintaxe padrão ES6 para importar um módulo é 'import'.",
+				reference: "Aula 5 - JavaScript Moderno",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o propósito do método toString() em JavaScript?",
+				options: [
+					"Converter um valor em string",
+					"Alterar o estado de um objeto",
+					"Criar um novo array baseado em strings",
+					"Dividir uma string em caracteres individuais",
+				],
+				answer: 0,
+				explanation:
+					"toString() é usado para converter valores, como números, em strings.",
+				reference: "Aula 5 - Métodos de Strings",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a funcionalidade da propriedade align-items no Flexbox?",
+				options: [
+					"Alinhar elementos verticalmente no contêiner",
+					"Alinhar elementos horizontalmente no contêiner",
+					"Distribuir espaço extra entre os elementos",
+					"Fixar a posição dos elementos no layout",
+				],
+				answer: 0,
+				explanation:
+					"align-items alinha elementos verticalmente dentro de um contêiner flexível.",
+				reference: "Aula 11 - CSS Flexbox",
+				seen: false,
+			},
+			{
+				question: "O que o método Object.keys() retorna?",
+				options: [
+					"Um array com as chaves de um objeto",
+					"Um array com os valores de um objeto",
+					"Um novo objeto baseado no original",
+					"As chaves e os valores de um objeto como pares",
+				],
+				answer: 0,
+				explanation:
+					"Object.keys() retorna um array com as chaves de um objeto.",
+				reference: "Aula 5 - Objetos em JavaScript",
+				seen: false,
+			},
+			{
+				question:
+					"O que acontece se duas chaves iguais forem usadas em um componente React?",
+				options: [
+					"O React não consegue identificar os itens corretamente",
+					"O React lança um erro de sintaxe",
+					"Os componentes são renderizados com valores duplicados",
+					"O React ignora completamente os elementos",
+				],
+				answer: 0,
+				explanation:
+					"Chaves únicas ajudam o React a identificar elementos em listas; chaves duplicadas causam inconsistências.",
+				reference: "Aula 3 - Listas em React",
+				seen: false,
+			},
+			{
+				question: "Como funciona o método reduce() em JavaScript?",
+				options: [
+					"Aplica uma função a cada elemento de um array, reduzindo-o a um único valor",
+					"Filtra elementos de um array com base em uma condição",
+					"Ordena os elementos de um array",
+					"Adiciona novos elementos ao final de um array",
+				],
+				answer: 0,
+				explanation:
+					"reduce() aplica uma função cumulativa a todos os elementos de um array, resultando em um único valor.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o comportamento da pseudo-classe :hover no CSS?",
+				options: [
+					"Aplica estilos a um elemento quando o cursor está sobre ele",
+					"Aplica estilos apenas a elementos inativos",
+					"Define a posição inicial de um elemento",
+					"Altera a hierarquia de um elemento no DOM",
+				],
+				answer: 0,
+				explanation:
+					":hover aplica estilos a um elemento quando o cursor está sobre ele.",
+				reference: "Aula 11 - CSS Avançado",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a vantagem de usar arrow functions no React?",
+				options: [
+					"Preservar o contexto do this",
+					"Eliminar a necessidade de hooks",
+					"Substituir componentes de classe",
+					"Evitar o uso de JSX",
+				],
+				answer: 0,
+				explanation:
+					"Arrow functions preservam o contexto do this, evitando problemas com funções em React.",
+				reference: "Aula 5 - JavaScript Moderno",
+				seen: false,
+			},
+			{
+				question: "O que é um PureComponent em React?",
+				options: [
+					"Um componente que só re-renderiza quando as props ou o estado mudam",
+					"Um componente funcional que não aceita props",
+					"Um componente que só pode ser usado em projetos com Redux",
+					"Um componente que gerencia rotas dinâmicas",
+				],
+				answer: 0,
+				explanation:
+					"PureComponents evitam renderizações desnecessárias ao comparar shallow props e estados.",
+				reference: "Aula 6 - Componentes Avançados",
+				seen: false,
+			},
+			{
+				question: "O que a diretiva @media faz no CSS?",
+				options: [
+					"Aplica estilos condicionais com base nas características do dispositivo",
+					"Define variáveis globais para o CSS",
+					"Cria animações baseadas em tempo",
+					"Adiciona estilos inline automaticamente",
+				],
+				answer: 0,
+				explanation:
+					"@media permite aplicar estilos condicionais com base em características como tamanho de tela.",
+				reference: "Aula 11 - CSS Responsivo",
+				seen: false,
+			},
+			{
+				question: "Qual é o propósito do hook useRef em React?",
+				options: [
+					"Criar uma referência mutável que persiste entre renderizações",
+					"Gerir estados globais de uma aplicação",
+					"Definir o ciclo de vida de componentes funcionais",
+					"Gerar valores únicos para cada renderização",
+				],
+				answer: 0,
+				explanation:
+					"useRef é usado para criar referências mutáveis que não causam novas renderizações.",
+				reference: "Aula 6 - Hooks Avançados",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é a diferença entre == e === em JavaScript?",
+				options: [
+					"=== verifica igualdade estrita, enquanto == converte os tipos antes de comparar",
+					"== é mais rápido que ===",
+					"=== só pode ser usado com strings",
+					"== verifica igualdade estrita, enquanto === faz conversão de tipo",
+				],
+				answer: 0,
+				explanation:
+					"=== verifica igualdade estrita sem conversão de tipo, enquanto == converte os tipos antes de comparar.",
+				reference: "Aula 5 - Comparações em JavaScript",
+				seen: false,
+			},
+			{
+				question: "Como se define um hook personalizado em React?",
+				options: [
+					"Criando uma função que começa com 'use' e utiliza outros hooks",
+					"Declarando diretamente no JSX",
+					"Criando uma classe que extende React.Hook",
+					"Adicionando o hook como parâmetro no estado",
+				],
+				answer: 0,
+				explanation:
+					"Hooks personalizados são funções que começam com 'use' e podem encapsular lógica de outros hooks.",
+				reference: "Aula 8 - Hooks Avançados",
+				seen: false,
+			},
+			{
+				question: "O que o método indexOf() retorna em um array?",
+				options: [
+					"O índice da primeira ocorrência de um valor no array",
+					"O índice da última ocorrência de um valor no array",
+					"Um novo array sem o valor pesquisado",
+					"A contagem de ocorrências de um valor no array",
+				],
+				answer: 0,
+				explanation:
+					"indexOf() retorna o índice da primeira ocorrência de um valor no array.",
+				reference: "Aula 4 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o comportamento padrão de um formulário HTML quando submetido?",
+				options: [
+					"Recarregar a página",
+					"Enviar os dados via AJAX automaticamente",
+					"Renderizar os dados diretamente na página",
+					"Enviar os dados para o local storage",
+				],
+				answer: 0,
+				explanation:
+					"O comportamento padrão de um formulário HTML é recarregar a página ao ser submetido.",
+				reference: "Aula 8 - Formulários HTML",
+				seen: false,
+			},
+			{
+				question: "Como o método split() funciona em JavaScript?",
+				options: [
+					"Divide uma string em substrings com base em um separador",
+					"Combina duas strings em uma única",
+					"Remove espaços extras de uma string",
+					"Converte uma string em um array de caracteres",
+				],
+				answer: 0,
+				explanation:
+					"split() divide uma string em substrings com base em um separador especificado.",
+				reference: "Aula 5 - Métodos de Strings",
+				seen: false,
+			},
+			{
+				question:
+					"Qual é o principal objetivo do React.StrictMode?",
+				options: [
+					"Identificar possíveis problemas em uma aplicação React durante o desenvolvimento",
+					"Otimizar automaticamente o desempenho da aplicação",
+					"Gerir estados globais de forma eficiente",
+					"Definir rotas dinâmicas sem o React Router",
+				],
+				answer: 0,
+				explanation:
+					"React.StrictMode ajuda a identificar problemas potenciais durante o desenvolvimento.",
+				reference: "Aula 6 - Debugging em React",
+				seen: false,
+			},
+			{
+				question: "O que o método join() faz em JavaScript?",
+				options: [
+					"Concatena todos os elementos de um array em uma string",
+					"Divide uma string em substrings",
+					"Adiciona novos elementos ao início de um array",
+					"Remove elementos duplicados de um array",
+				],
+				answer: 0,
+				explanation:
+					"join() concatena todos os elementos de um array em uma string.",
+				reference: "Aula 5 - Métodos de Arrays",
+				seen: false,
+			},
+			{
+				question: "Qual é o propósito da diretiva @mixin no SCSS?",
+				options: [
+					"Criar blocos reutilizáveis de código estilístico",
+					"Definir variáveis globais",
+					"Importar arquivos CSS externos",
+					"Adicionar estilos diretamente no DOM"
+				],
+				answer: 0,
+				explanation: "A diretiva @mixin é usada para criar blocos reutilizáveis de código no SCSS.",
+				reference: "Aula 14 - Mixins no SCSS",
+				seen: false
+			},
+			{
+				question: "Como se define uma variável em SCSS?",
+				options: [
+					"$corPrimaria: #ff0000;",
+					"var(--corPrimaria, #ff0000);",
+					"let corPrimaria = #ff0000;",
+					"@variable corPrimaria = #ff0000;"
+				],
+				answer: 0,
+				explanation: "Variáveis em SCSS começam com o símbolo '$'.",
+				reference: "Aula 13 - SCSS Variáveis",
+				seen: false
+			},
+			{
+				question: "Qual é o comportamento do aninhamento de seletores no SCSS?",
+				options: [
+					"Permite criar seletores hierárquicos com base na estrutura do HTML",
+					"Cria classes CSS globais automaticamente",
+					"Adiciona estilos diretamente no DOM",
+					"Elimina a necessidade de classes no CSS"
+				],
+				answer: 0,
+				explanation: "O aninhamento permite criar seletores CSS hierárquicos, tornando o código mais legível.",
+				reference: "Aula 13 - SCSS Aninhamento",
+				seen: false
+			},
+			{
+				question: "O que a diretiva @import faz no SCSS?",
+				options: [
+					"Importa arquivos SCSS ou CSS para reutilização de estilos",
+					"Define variáveis globais",
+					"Cria mixins reutilizáveis",
+					"Remove redundâncias no código"
+				],
+				answer: 0,
+				explanation: "A diretiva @import é usada para importar arquivos SCSS ou CSS.",
+				reference: "Aula 14 - Diretiva @import",
+				seen: false
+			},
+			{
+				question: "Como funciona a diretiva @extend no SCSS?",
+				options: [
+					"Permite herdar estilos de outro seletor",
+					"Define variáveis globais",
+					"Cria loops dentro do SCSS",
+					"Aplica estilos inline automaticamente"
+				],
+				answer: 0,
+				explanation: "@extend é usada para herdar estilos de outros seletores.",
+				reference: "Aula 14 - Diretiva @extend",
+				seen: false
+			},
+			{
+				question: "O que é um partial no SCSS?",
+				options: [
+					"Um arquivo SCSS que é importado por outros arquivos e não é compilado diretamente",
+					"Um tipo especial de mixin que aceita variáveis",
+					"Uma diretiva para criar loops",
+					"Um arquivo CSS gerado automaticamente"
+				],
+				answer: 0,
+				explanation: "Partials são arquivos SCSS que começam com _ e são importados por outros arquivos.",
+				reference: "Aula 14 - Partials no SCSS",
+				seen: false
+			},
+			{
+				question: "Como funciona a diretiva @media no SCSS?",
+				options: [
+					"Aplica estilos condicionais com base nas características do dispositivo",
+					"Define variáveis globais para o CSS",
+					"Cria animações baseadas em tempo",
+					"Adiciona estilos inline automaticamente"
+				],
+				answer: 0,
+				explanation: "@media é usada para aplicar estilos condicionais.",
+				reference: "Aula 13 - SCSS Responsivo",
+				seen: false
+			},
+			{
+				question: "Qual das opções descreve corretamente o propósito de variáveis em SCSS?",
+				options: [
+					"Facilitar a alteração de valores globais no código",
+					"Criar blocos de código reutilizáveis",
+					"Adicionar interatividade aos elementos",
+					"Gerenciar APIs externas"
+				],
+				answer: 0,
+				explanation: "Variáveis em SCSS facilitam a alteração e reutilização de valores globais.",
+				reference: "Aula 13 - Variáveis no SCSS",
+				seen: false
+			},
+			{
+				question: "O que acontece ao usar @each no SCSS?",
+				options: [
+					"Permite iterar sobre listas ou mapas",
+					"Define variáveis globais",
+					"Cria mixins reutilizáveis",
+					"Remove redundâncias no código"
+				],
+				answer: 0,
+				explanation: "@each é usado para iterar sobre listas ou mapas.",
+				reference: "Aula 14 - Iterações no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual é o principal benefício do uso de mixins no SCSS?",
+				options: [
+					"Reutilizar blocos de código estilístico em diferentes partes do projeto",
+					"Definir variáveis globais",
+					"Criar seletores aninhados automaticamente",
+					"Evitar o uso de media queries"
+				],
+				answer: 0,
+				explanation: "Mixins permitem reutilizar blocos de código e evitar redundâncias.",
+				reference: "Aula 14 - Mixins no SCSS",
+				seen: false
+			},
+			{
+				question: "Como definir um mapa no SCSS?",
+				options: [
+					"$cores: (primaria: #ff0000, secundaria: #00ff00);",
+					"let cores = {primaria: #ff0000, secundaria: #00ff00};",
+					"@map cores {primaria: #ff0000, secundaria: #00ff00};",
+					"map($cores) -> primaria: #ff0000;"
+				],
+				answer: 0,
+				explanation: "Mapas no SCSS são definidos com parênteses e pares chave:valor.",
+				reference: "Aula 14 - Mapas no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual é a sintaxe correta para usar @if no SCSS?",
+				options: [
+					"@if $cor == 'red' { background-color: red; }",
+					"@if ($cor == 'red') { background-color: red; }",
+					"if ($cor = 'red') { background-color: red; }",
+					"if $cor == 'red' -> background-color: red;"
+				],
+				answer: 1,
+				explanation: "A sintaxe do @if em SCSS usa parênteses e blocos de estilo.",
+				reference: "Aula 14 - Condicionais no SCSS",
+				seen: false
+			},
+			{
+				question: "O que acontece ao usar funções no SCSS?",
+				options: [
+					"Permite criar valores dinâmicos com base em cálculos ou condições",
+					"Adiciona estilos inline ao DOM",
+					"Aplica animações aos elementos CSS",
+					"Elimina a necessidade de variáveis"
+				],
+				answer: 0,
+				explanation: "Funções no SCSS são usadas para criar valores dinâmicos.",
+				reference: "Aula 14 - Funções no SCSS",
+				seen: false
+			},
+			{
+				question: "Como usar o operador de divisão no SCSS?",
+				options: [
+					"width: 100px / 2;",
+					"width: calc(100px / 2);",
+					"divide(100px, 2);",
+					"100px divided by 2;"
+				],
+				answer: 0,
+				explanation: "O operador de divisão no SCSS é usado diretamente com '/' em valores numéricos.",
+				reference: "Aula 13 - Operadores no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual é a sintaxe correta para usar @for no SCSS?",
+				options: [
+					"@for $i from 1 through 3 { .item-#{$i} { width: #{$i * 10}px; } }",
+					"for ($i = 1; $i <= 3; $i++) { .item-#{$i} { width: #{$i * 10}px; } }",
+					"@loop($i, 1 to 3) { .item-#{$i} { width: #{$i * 10}px; } }",
+					"for (1..3) -> .item-i;"
+				],
+				answer: 0,
+				explanation: "A diretiva @for usa a sintaxe 'from' e 'through' para criar loops.",
+				reference: "Aula 14 - Loops no SCSS",
+				seen: false
+			}, {
+				question: "Dado o código abaixo, qual será o resultado no estilo do botão?\n\n```scss\n$corPrimaria: #3498db;\n\n.botao {\n    background-color: $corPrimaria;\n    &:hover {\n        background-color: darken($corPrimaria, 10%);\n    }\n}\n```",
+				options: [
+					"O botão terá uma cor de fundo azul claro, que escurece no hover.",
+					"O botão terá uma cor de fundo azul escuro, que clareia no hover.",
+					"O botão terá uma cor de fundo transparente.",
+					"O código lança um erro porque darken() não é válido."
+				],
+				answer: 0,
+				explanation: "O código define uma variável de cor e utiliza a função darken() para escurecer a cor ao passar o mouse sobre o botão.",
+				reference: "Aula 13 - Funções no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual será o resultado ao compilar o seguinte código SCSS?\n\n```scss\n@mixin bordas($largura, $estilo, $cor) {\n    border: $largura $estilo $cor;\n}\n\n.caixa {\n    @include bordas(2px, solid, red);\n}\n```",
+				options: [
+					"O elemento com a classe .caixa terá uma borda vermelha sólida de 2px.",
+					"O elemento com a classe .caixa terá uma borda preta sólida de 2px.",
+					"O código lança um erro porque @include não está definido.",
+					"Nada será aplicado, pois mixins não afetam o CSS."
+				],
+				answer: 0,
+				explanation: "O mixin bordas é incluído corretamente e define a borda conforme os valores fornecidos.",
+				reference: "Aula 14 - Mixins no SCSS",
+				seen: false
+			},
+			{
+				question: "O que o código abaixo produz no CSS final?\n\n```scss\n$cores: (\n    primaria: #3498db,\n    secundaria: #2ecc71\n);\n\n.botao {\n    background-color: map-get($cores, primaria);\n}\n```",
+				options: [
+					"O botão terá uma cor de fundo azul (#3498db).",
+					"O botão terá uma cor de fundo verde (#2ecc71).",
+					"O código lança um erro porque map-get não é suportado.",
+					"O CSS final será vazio, pois $cores não é utilizado."
+				],
+				answer: 0,
+				explanation: "A função map-get retorna o valor associado à chave 'primaria' no mapa $cores.",
+				reference: "Aula 14 - Mapas no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual será o comportamento do seguinte código SCSS?\n\n```scss\n$base: 16px;\n\n.tamanho {\n    font-size: $base * 1.5;\n}\n```",
+				options: [
+					"O tamanho da fonte será 24px.",
+					"O tamanho da fonte será 16px.",
+					"O código lança um erro porque * não pode ser usado em SCSS.",
+					"O tamanho da fonte será calculado no navegador."
+				],
+				answer: 0,
+				explanation: "O SCSS realiza a operação matemática diretamente, resultando em 24px no CSS compilado.",
+				reference: "Aula 13 - Operações Matemáticas no SCSS",
+				seen: false
+			},
+			{
+				question: "O que o seguinte código faz?\n\n```scss\n@mixin centralizar {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n.container {\n    @include centralizar;\n}\n```",
+				options: [
+					"O elemento .container será centralizado usando flexbox.",
+					"O código lançará um erro porque a função centralizar não está definida.",
+					"Nada será aplicado, pois o mixin não aceita argumentos.",
+					"O elemento será posicionado no topo da página."
+				],
+				answer: 0,
+				explanation: "O mixin aplica estilos flexbox para centralizar o conteúdo do elemento.",
+				reference: "Aula 14 - Mixins no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual será o resultado do seguinte código?\n\n```scss\n.titulos {\n    h1, h2, h3 {\n        color: #3498db;\n    }\n}\n```",
+				options: [
+					"Os elementos h1, h2 e h3 dentro de .titulos terão a cor azul.",
+					"Todos os elementos h1, h2 e h3 na página terão a cor azul.",
+					"O código lançará um erro porque múltiplos seletores não são suportados.",
+					"Nada será aplicado, pois o SCSS não compila esse código."
+				],
+				answer: 0,
+				explanation: "O SCSS permite aninhar múltiplos seletores, aplicando o estilo apenas aos filhos de .titulos.",
+				reference: "Aula 13 - Aninhamento no SCSS",
+				seen: false
+			},
+			{
+				question: "O que será gerado a partir do seguinte código SCSS?\n\n```scss\n@for $i from 1 through 3 {\n    .coluna-#{$i} {\n        width: 100% / $i;\n    }\n}\n```",
+				options: [
+					"Três classes, cada uma com largura proporcional: 100%, 50%, e 33.33%.",
+					"Três classes com larguras iguais de 100%.",
+					"Nenhuma classe será gerada porque o loop está incorreto.",
+					"O código lança um erro porque #{} não é válido no SCSS."
+				],
+				answer: 0,
+				explanation: "O @for gera três classes com larguras proporcionais, calculadas diretamente no SCSS.",
+				reference: "Aula 14 - Loops no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual é a saída do seguinte código SCSS?\n\n```scss\n@mixin responsivo($dispositivo) {\n    @if $dispositivo == 'mobile' {\n        max-width: 600px;\n    } @else {\n        max-width: 1200px;\n    }\n}\n\n.container {\n    @include responsivo('mobile');\n}\n```",
+				options: [
+					"O contêiner terá max-width de 600px.",
+					"O contêiner terá max-width de 1200px.",
+					"O código lançará um erro porque @if não suporta comparações.",
+					"Nada será aplicado porque o mixin não aceita argumentos."
+				],
+				answer: 0,
+				explanation: "O mixin usa a lógica condicional para aplicar max-width de 600px para o dispositivo 'mobile'.",
+				reference: "Aula 14 - Condicionais no SCSS",
+				seen: false
+			},
+			{
+				question: "O que ocorre com o código SCSS abaixo?\n\n```scss\n$fontes: (pequena: 12px, media: 16px, grande: 24px);\n\n.texto {\n    font-size: map-get($fontes, media);\n}\n```",
+				options: [
+					"A fonte do texto será de 16px.",
+					"A fonte do texto será de 12px.",
+					"O código lançará um erro porque map-get não é válido.",
+					"Nada será aplicado, pois a chave 'media' não existe."
+				],
+				answer: 0,
+				explanation: "A função map-get retorna o valor associado à chave 'media', que é 16px.",
+				reference: "Aula 14 - Mapas no SCSS",
+				seen: false
+			}, {
+				question: "O que o seguinte código SCSS irá gerar no CSS final?\n\n```scss\n$espacamento: 10px;\n\n.lista {\n    li {\n        margin-bottom: $espacamento;\n    }\n}\n```",
+				options: [
+					"Os elementos <li> dentro de .lista terão margin-bottom de 10px.",
+					"Todos os elementos <li> na página terão margin-bottom de 10px.",
+					"O código lançará um erro porque variáveis não podem ser usadas no aninhamento.",
+					"Nada será aplicado, pois o SCSS não suporta aninhamento."
+				],
+				answer: 0,
+				explanation: "O SCSS aplica margin-bottom de 10px apenas aos <li> filhos de .lista.",
+				reference: "Aula 13 - Aninhamento no SCSS",
+				seen: false
+			},
+			{
+				question: "Dado o seguinte código SCSS, qual será a largura da barra lateral?\n\n```scss\n$layout: (\n    sidebar: 25%,\n    content: 75%\n);\n\n.sidebar {\n    width: map-get($layout, sidebar);\n}\n```",
+				options: [
+					"A largura será de 25%.",
+					"A largura será de 75%.",
+					"O código lançará um erro porque map-get não aceita percentuais.",
+					"Nada será aplicado, pois o mapa não foi declarado corretamente."
+				],
+				answer: 0,
+				explanation: "A função map-get retorna o valor associado à chave 'sidebar', que é 25%.",
+				reference: "Aula 14 - Mapas no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual será o resultado do seguinte código SCSS no CSS final?\n\n```scss\n$corPrimaria: #ff5733;\n$corSecundaria: lighten($corPrimaria, 20%);\n\n.titulo {\n    color: $corSecundaria;\n}\n```",
+				options: [
+					"A cor do texto será um laranja mais claro que #ff5733.",
+					"A cor do texto será um laranja mais escuro que #ff5733.",
+					"O código lançará um erro porque lighten() não aceita variáveis.",
+					"Nada será aplicado, pois $corSecundaria não foi declarado corretamente."
+				],
+				answer: 0,
+				explanation: "A função lighten() clareia a cor base em 20%.",
+				reference: "Aula 13 - Funções no SCSS",
+				seen: false
+			},
+			{
+				question: "O que o seguinte código SCSS irá gerar?\n\n```scss\n@mixin grade($colunas) {\n    width: 100% / $colunas;\n}\n\n.coluna {\n    @include grade(4);\n}\n```",
+				options: [
+					"A largura será de 25%.",
+					"A largura será de 100%.",
+					"O código lançará um erro porque @include não aceita valores numéricos.",
+					"Nada será aplicado, pois o mixin não foi declarado corretamente."
+				],
+				answer: 0,
+				explanation: "O SCSS calcula a largura como 100% dividido pelo número de colunas fornecido (4).",
+				reference: "Aula 14 - Mixins no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual será o resultado do código abaixo?\n\n```scss\n@mixin centralizar {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n}\n\n.caixa {\n    @include centralizar;\n    height: 100px;\n    width: 100px;\n}\n```",
+				options: [
+					"O conteúdo da .caixa será centralizado.",
+					"O código lançará um erro porque o mixin precisa de argumentos.",
+					"A altura e largura serão ignoradas.",
+					"Nada será aplicado, pois o SCSS não suporta flexbox."
+				],
+				answer: 0,
+				explanation: "O mixin aplica estilos flexbox para centralizar o conteúdo, enquanto as dimensões da .caixa permanecem.",
+				reference: "Aula 14 - Mixins no SCSS",
+				seen: false
+			},
+			{
+				question: "O que acontece ao compilar o seguinte código SCSS?\n\n```scss\n@mixin responsivo($dispositivo) {\n    @if $dispositivo == 'mobile' {\n        max-width: 600px;\n    } @else {\n        max-width: 1200px;\n    }\n}\n\n.container {\n    @include responsivo('desktop');\n}\n```",
+				options: [
+					"O contêiner terá max-width de 1200px.",
+					"O contêiner terá max-width de 600px.",
+					"O código lançará um erro porque @if não suporta strings.",
+					"Nada será aplicado, pois o mixin não aceita argumentos."
+				],
+				answer: 0,
+				explanation: "O SCSS aplica max-width de 1200px com base no argumento fornecido.",
+				reference: "Aula 14 - Condicionais no SCSS",
+				seen: false
+			},
+			{
+				question: "Qual é a saída do seguinte código SCSS?\n\n```scss\n@for $i from 1 through 3 {\n    .coluna-#{$i} {\n        width: 100% / $i;\n    }\n}\n```",
+				options: [
+					"Três classes, cada uma com largura proporcional: 100%, 50%, e 33.33%.",
+					"Uma única classe com largura de 100%.",
+					"O código lançará um erro porque #{} não é válido no SCSS.",
+					"Nada será gerado porque o loop está incorreto."
+				],
+				answer: 0,
+				explanation: "O SCSS gera três classes com larguras proporcionais usando o loop @for.",
+				reference: "Aula 14 - Loops no SCSS",
+				seen: false
+			},
+			{
+				question: "O que o seguinte código SCSS faz?\n\n```scss\n$base: 16px;\n\n.texto {\n    font-size: $base * 1.25;\n}\n```",
+				options: [
+					"Define um tamanho de fonte de 20px.",
+					"Define um tamanho de fonte de 16px.",
+					"Lança um erro porque * não pode ser usado em variáveis.",
+					"Nada será aplicado, pois o cálculo é feito pelo navegador."
+				],
+				answer: 0,
+				explanation: "O SCSS realiza a operação matemática diretamente, resultando em 20px no CSS final.",
+				reference: "Aula 13 - Operações Matemáticas no SCSS",
+				seen: false
+			},
+			{
+				question: "O que será gerado a partir do seguinte código SCSS?\n\n```scss\n$cores: (\n    primaria: #3498db,\n    secundaria: #2ecc71\n);\n\n.botao {\n    background-color: map-get($cores, secundaria);\n}\n```",
+				options: [
+					"O botão terá uma cor de fundo verde (#2ecc71).",
+					"O botão terá uma cor de fundo azul (#3498db).",
+					"O código lançará um erro porque map-get não aceita mapas.",
+					"Nada será aplicado, pois o mapa foi declarado incorretamente."
+				],
+				answer: 0,
+				explanation: "A função map-get retorna o valor associado à chave 'secundaria'.",
+				reference: "Aula 14 - Mapas no SCSS",
+				seen: false
+			},
+			{
+				question: "Dado o seguinte código, qual será o valor do margin-bottom?\n\n```scss\n$espacamento: 15px;\n\n.lista {\n    li {\n        margin-bottom: $espacamento;\n    }\n}\n```",
+				options: [
+					"Os elementos <li> terão margin-bottom de 15px.",
+					"Todos os elementos <li> na página terão margin-bottom de 15px.",
+					"O código lançará um erro porque $espacamento não é usado corretamente.",
+					"Nada será aplicado, pois variáveis não funcionam no SCSS."
+				],
+				answer: 0,
+				explanation: "O SCSS aplica margin-bottom de 15px apenas aos <li> filhos de .lista.",
+				reference: "Aula 13 - Variáveis no SCSS",
+				seen: false
+			}, {
+				question: "Qual será o resultado ao renderizar o seguinte componente React?\n\n```jsx\nfunction App() {\n    const [count, setCount] = React.useState(0);\n\n    return (\n        <div>\n            <p>O contador está em {count}</p>\n            <button onClick={() => setCount(count + 1)}>Incrementar</button>\n        </div>\n    );\n}\n```",
+				options: [
+					"O botão incrementará o contador exibido ao ser clicado.",
+					"O botão não terá nenhum efeito.",
+					"O código lançará um erro porque o estado não foi inicializado.",
+					"O componente não renderizará nada."
+				],
+				answer: 0,
+				explanation: "O React.useState inicializa o estado com 0, e a função setCount atualiza o valor ao clicar no botão.",
+				reference: "Aula 3 - useState em React",
+				seen: false
+			},
+			{
+				question: "Dado o código abaixo, o que acontece ao clicar no botão?\n\n```jsx\nfunction App() {\n    const [mensagem, setMensagem] = React.useState('Olá, mundo!');\n\n    const atualizarMensagem = () => {\n        setMensagem('Você clicou no botão!');\n    };\n\n    return (\n        <div>\n            <p>{mensagem}</p>\n            <button onClick={atualizarMensagem}>Clique aqui</button>\n        </div>\n    );\n}\n```",
+				options: [
+					"O texto será alterado para 'Você clicou no botão!' ao clicar no botão.",
+					"Nada acontece porque o estado não é atualizado.",
+					"O código lançará um erro porque setMensagem não é definido.",
+					"O botão será desabilitado após o clique."
+				],
+				answer: 0,
+				explanation: "O estado 'mensagem' é atualizado pela função setMensagem, e o texto renderizado muda dinamicamente.",
+				reference: "Aula 3 - Estados em React",
+				seen: false
+			},
+			{
+				question: "O que será exibido na interface com o código abaixo?\n\n```jsx\nfunction App() {\n    const [isVisible, setIsVisible] = React.useState(true);\n\n    return (\n        <div>\n            {isVisible && <p>Conteúdo visível</p>}\n            <button onClick={() => setIsVisible(!isVisible)}>Alternar</button>\n        </div>\n    );\n}\n```",
+				options: [
+					"Inicialmente, 'Conteúdo visível' será exibido, e desaparecerá ao clicar no botão.",
+					"Nada será exibido porque isVisible está definido como true.",
+					"O código lançará um erro porque a condição de renderização está incorreta.",
+					"A mensagem será exibida permanentemente, independentemente do clique."
+				],
+				answer: 0,
+				explanation: "A condição isVisible controla a exibição do parágrafo. O botão alterna o estado entre true e false.",
+				reference: "Aula 3 - Renderização Condicional",
+				seen: false
+			},
+			{
+				question: "O que acontece ao usar o hook useEffect neste exemplo?\n\n```jsx\nfunction App() {\n    const [count, setCount] = React.useState(0);\n\n    React.useEffect(() => {\n        console.log(`O contador mudou para: ${count}`);\n    }, [count]);\n\n    return (\n        <button onClick={() => setCount(count + 1)}>Incrementar</button>\n    );\n}\n```",
+				options: [
+					"A mensagem será registrada no console toda vez que o botão for clicado.",
+					"O código lançará um erro porque o useEffect precisa de um array de dependências vazio.",
+					"Nada será registrado no console.",
+					"O contador não será incrementado ao clicar no botão."
+				],
+				answer: 0,
+				explanation: "O useEffect é acionado sempre que o valor de 'count' muda, registrando a mensagem no console.",
+				reference: "Aula 6 - useEffect em React",
+				seen: false
+			},
+			{
+				question: "Qual será o comportamento do seguinte código React?\n\n```jsx\nfunction App() {\n    const [text, setText] = React.useState('');\n\n    return (\n        <input\n            value={text}\n            onChange={(e) => setText(e.target.value)}\n        />\n    );\n}\n```",
+				options: [
+					"O input atualizará seu valor à medida que o usuário digita.",
+					"O input estará desabilitado e não permitirá alterações.",
+					"O código lançará um erro porque o estado não é inicializado.",
+					"Nada será exibido na interface."
+				],
+				answer: 0,
+				explanation: "O estado 'text' é atualizado dinamicamente com o evento onChange.",
+				reference: "Aula 8 - Controlled Components",
+				seen: false
+			}
+			,
+			{
+				question: "O que acontece ao clicar no botão neste componente?\n\n```jsx\nfunction App() {\n    const [count, setCount] = React.useState(0);\n\n    return (\n        <div>\n            <p>{count}</p>\n            <button onClick={() => setCount((prev) => prev + 2)}>Incrementar</button>\n        </div>\n    );\n}\n```",
+				options: [
+					"O contador será incrementado em 2 a cada clique.",
+					"O contador será incrementado em 1 a cada clique.",
+					"O código lançará um erro porque 'prev' não é uma variável válida.",
+					"Nada será exibido na interface."
+				],
+				answer: 0,
+				explanation: "O método setCount utiliza a função de callback para incrementar o estado em 2.",
+				reference: "Aula 3 - Atualização de Estados",
+				seen: false
+			},
+			{
+				question: "O que será exibido com o código abaixo?\n\n```jsx\nfunction App() {\n    const items = ['React', 'JavaScript', 'CSS'];\n\n    return (\n        <ul>\n            {items.map((item, index) => (\n                <li key={index}>{item}</li>\n            ))}\n        </ul>\n    );\n}\n```",
+				options: [
+					"Uma lista não ordenada com os itens: React, JavaScript, e CSS.",
+					"Uma lista vazia porque 'key' não é único.",
+					"O código lançará um erro porque map() não é uma função válida.",
+					"Nada será exibido porque 'items' não é inicializado."
+				],
+				answer: 0,
+				explanation: "O método map gera uma lista de elementos <li>, cada um com uma chave única baseada no índice.",
+				reference: "Aula 3 - Listas e Chaves",
+				seen: false
+			},
+			{
+				question: "Qual será o resultado ao usar o hook useMemo neste código?\n\n```jsx\nfunction App() {\n    const [count, setCount] = React.useState(0);\n\n    const doubled = React.useMemo(() => count * 2, [count]);\n\n    return (\n        <div>\n            <p>Dobro: {doubled}</p>\n            <button onClick={() => setCount(count + 1)}>Incrementar</button>\n        </div>\n    );\n}\n```",
+				options: [
+					"O valor dobrado será recalculado apenas quando 'count' mudar.",
+					"O valor dobrado será recalculado em toda renderização.",
+					"O código lançará um erro porque useMemo não aceita dependências.",
+					"Nada será exibido porque 'doubled' não é renderizado."
+				],
+				answer: 0,
+				explanation: "O useMemo memoriza o valor calculado de 'count * 2', recalculando apenas quando 'count' muda.",
+				reference: "Aula 8 - Hooks Avançados",
+				seen: false
+			},
+			{
+				question: "O que será exibido com o seguinte código React?\n\n```jsx\nfunction App() {\n    const [show, setShow] = React.useState(false);\n\n    return (\n        <div>\n            {show ? <p>Visível</p> : <p>Oculto</p>}\n            <button onClick={() => setShow(!show)}>Alternar</button>\n        </div>\n    );\n}\n```",
+				options: [
+					"'Oculto' será exibido inicialmente, e alternará para 'Visível' ao clicar no botão.",
+					"'Visível' será exibido permanentemente.",
+					"'Oculto' será exibido permanentemente.",
+					"O código lançará um erro porque 'show' não é inicializado."
+				],
+				answer: 0,
+				explanation: "O estado 'show' controla a renderização condicional do texto exibido.",
+				reference: "Aula 3 - Renderização Condicional",
+				seen: false
+			},
+			{
+				question: "Qual é o comportamento do seguinte componente React?\n\n```jsx\nfunction App() {\n    const [name, setName] = React.useState('');\n\n    return (\n        <form onSubmit={(e) => {\n            e.preventDefault();\n            console.log(`Nome enviado: ${name}`);\n        }}>\n            <input\n                type=\"text\"\n                value={name}\n                onChange={(e) => setName(e.target.value)}\n            />\n            <button type=\"submit\">Enviar</button>\n        </form>\n    );\n}\n```",
+				options: [
+					"O nome será exibido no console ao enviar o formulário.",
+					"O formulário será recarregado ao enviar.",
+					"Nada será exibido porque o botão não está vinculado a um evento.",
+					"O código lançará um erro porque onSubmit não é uma função válida."
+				],
+				answer: 0,
+				explanation: "O evento preventDefault evita o recarregamento da página, e o nome é registrado no console.",
+				reference: "Aula 8 - Formulários em React",
+				seen: false
+			}, {
+				question: "Qual será o resultado ao renderizar o seguinte componente React?\n\n```jsx\nfunction App() {\n    const [likes, setLikes] = React.useState(0);\n\n    return (\n        <div>\n            <button onClick={() => setLikes(likes + 1)}>Curtir</button>\n            <p>{likes === 1 ? `${likes} pessoa curtiu isso` : `${likes} pessoas curtiram isso`}</p>\n        </div>\n    );\n}\n```",
+				options: [
+					"A contagem de curtidas será atualizada corretamente e o texto será ajustado com base no número de curtidas.",
+					"O texto exibido será sempre no singular.",
+					"Nada será exibido, pois o código contém erros de lógica.",
+					"O botão não terá nenhum efeito ao ser clicado."
+				],
+				answer: 0,
+				explanation: "A lógica condicional dentro do parágrafo ajusta o texto com base no valor de 'likes'.",
+				reference: "Aula 3 - Renderização Condicional",
+				seen: false
+			},
+			{
+				question: "O que será exibido ao renderizar este componente?\n\n```jsx\nfunction App() {\n    const [active, setActive] = React.useState(false);\n\n    return (\n        <button\n            onClick={() => setActive(!active)}\n            style={{ backgroundColor: active ? 'green' : 'red' }}\n        >\n            {active ? 'Ativo' : 'Inativo'}\n        </button>\n    );\n}\n```",
+				options: [
+					"O botão mudará de cor e texto ao ser clicado.",
+					"O botão terá sempre o texto 'Ativo'.",
+					"Nada será exibido porque o estado não é inicializado.",
+					"O código lançará um erro porque o evento onClick não é definido corretamente."
+				],
+				answer: 0,
+				explanation: "A mudança no estado 'active' altera tanto o texto quanto a cor do botão.",
+				reference: "Aula 3 - Estados Dinâmicos",
+				seen: false
+			},
+			{
+				question: "O que será exibido com o código abaixo?\n\n```jsx\nfunction Lista({ items }) {\n    return (\n        <ul>\n            {items.map((item, index) => (\n                <li key={index}>{item}</li>\n            ))}\n        </ul>\n    );\n}\n\nfunction App() {\n    const frutas = ['Maçã', 'Banana', 'Laranja'];\n    return <Lista items={frutas} />;\n}\n```",
+				options: [
+					"Uma lista com os itens: Maçã, Banana, Laranja.",
+					"O código lançará um erro porque os itens não têm chaves únicas.",
+					"Nada será exibido porque o array 'frutas' está vazio.",
+					"Uma lista com itens duplicados será exibida."
+				],
+				answer: 0,
+				explanation: "O componente Lista renderiza os itens fornecidos como uma lista não ordenada.",
+				reference: "Aula 3 - Listas e Props",
+				seen: false
+			},
+			{
+				question: "O que acontece com o seguinte código?\n\n```jsx\nfunction App() {\n    const [count, setCount] = React.useState(0);\n\n    React.useEffect(() => {\n        document.title = `Contador: ${count}`;\n    }, [count]);\n\n    return (\n        <button onClick={() => setCount(count + 1)}>Incrementar</button>\n    );\n}\n```",
+				options: [
+					"O título da página será atualizado com o valor do contador ao clicar no botão.",
+					"O título da página permanecerá como 'React App'.",
+					"O código lançará um erro porque useEffect não pode alterar o título da página.",
+					"O contador não será incrementado."
+				],
+				answer: 0,
+				explanation: "O useEffect atualiza o título da página sempre que o estado 'count' muda.",
+				reference: "Aula 6 - useEffect em React",
+				seen: false
+			},
+			{
+				question: "Qual será o comportamento do seguinte código?\n\n```jsx\nfunction App() {\n    const [numero, setNumero] = React.useState(1);\n\n    const multiplicado = React.useMemo(() => numero * 10, [numero]);\n\n    return (\n        <div>\n            <p>Resultado: {multiplicado}</p>\n            <button onClick={() => setNumero(numero + 1)}>Incrementar</button>\n        </div>\n    );\n}\n```",
+				options: [
+					"O valor exibido será recalculado apenas quando 'numero' mudar.",
+					"O valor será recalculado em cada renderização.",
+					"Nada será exibido porque o cálculo está incorreto.",
+					"O código lançará um erro porque useMemo não aceita dependências."
+				],
+				answer: 0,
+				explanation: "O hook useMemo memoriza o resultado do cálculo e só o recalcula quando 'numero' muda.",
+				reference: "Aula 8 - Hooks Avançados",
+				seen: false
+			},
+			{
+				question: "O que será exibido com o código abaixo?\n\n```jsx\nfunction App() {\n    const [texto, setTexto] = React.useState('Olá');\n\n    return (\n        <div>\n            <input\n                value={texto}\n                onChange={(e) => setTexto(e.target.value)}\n            />\n            <p>{texto}</p>\n        </div>\n    );\n}\n```",
+				options: [
+					"O parágrafo exibirá o texto digitado no input.",
+					"Nada será exibido porque o estado não é atualizado.",
+					"O código lançará um erro porque o estado 'texto' não foi inicializado.",
+					"O parágrafo exibirá sempre 'Olá'."
+				],
+				answer: 0,
+				explanation: "O estado 'texto' é atualizado dinamicamente pelo evento onChange.",
+				reference: "Aula 8 - Controlled Components",
+				seen: false
+			}
+
+			,
+			{
+				question: "Qual será o comportamento do seguinte componente React?\n\n```jsx\nfunction App() {\n    const [count, setCount] = React.useState(0);\n\n    React.useEffect(() => {\n        console.log('O componente foi montado ou atualizado.');\n    });\n\n    return (\n        <button onClick={() => setCount(count + 1)}>Clique aqui</button>\n    );\n}\n```",
+				options: [
+					"A mensagem será registrada no console em todas as renderizações.",
+					"A mensagem será registrada apenas uma vez ao montar o componente.",
+					"Nada será registrado no console.",
+					"O código lançará um erro porque useEffect precisa de dependências."
+				],
+				answer: 0,
+				explanation: "Sem um array de dependências, o useEffect é acionado em todas as renderizações.",
+				reference: "Aula 6 - useEffect em React",
+				seen: false
+			},
+			{
+				question: "O que acontece com o seguinte código React?\n\n```jsx\nfunction App() {\n    const [count, setCount] = React.useState(0);\n\n    const incrementar = React.useCallback(() => {\n        setCount((prev) => prev + 1);\n    }, []);\n\n    return (\n        <button onClick={incrementar}>Incrementar</button>\n    );\n}\n```",
+				options: [
+					"A função incrementar será memorizada e não será recriada em renderizações futuras.",
+					"A função incrementar será recriada em cada renderização.",
+					"Nada será exibido porque useCallback não é usado corretamente.",
+					"O código lançará um erro porque useCallback precisa de dependências."
+				],
+				answer: 0,
+				explanation: "O hook useCallback memoriza a função incrementar, garantindo que não seja recriada em cada renderização.",
+				reference: "Aula 8 - Hooks Avançados",
+				seen: false
+			},
+			{
+				question: "Qual será o resultado ao usar o Context API neste exemplo?\n\n```jsx\nconst TemaContext = React.createContext('claro');\n\nfunction App() {\n    return (\n        <TemaContext.Provider value=\"escuro\">\n            <Conteudo />\n        </TemaContext.Provider>\n    );\n}\n\nfunction Conteudo() {\n    const tema = React.useContext(TemaContext);\n    return <p>Tema atual: {tema}</p>;\n}\n```",
+				options: [
+					"O parágrafo exibirá 'Tema atual: escuro'.",
+					"O parágrafo exibirá 'Tema atual: claro'.",
+					"O código lançará um erro porque useContext não pode ser usado fora de um Provider.",
+					"Nada será exibido porque o contexto não foi definido."
+				],
+				answer: 0,
+				explanation: "O valor 'escuro' fornecido pelo Provider é acessado pelo hook useContext no componente Conteudo.",
+				reference: "Aula 6 - Context API",
+				seen: false
+			},
+		];
+
+
+		const verificarDuplicatas = (lista) => {
+			const perguntasUnicas = lista.map(item => item.question);
+			const duplicatas = lista.filter((item, index) => {
+				return perguntasUnicas.indexOf(item.question) !== perguntasUnicas.lastIndexOf(item.question);
+			});
+			return duplicatas;
+		};
+
+		const perguntasDuplicadas = verificarDuplicatas(questions);
+		console.log(perguntasDuplicadas);
+
+		let currentQuestions = [];
+		let currentQuestionIndex = 0;
+		let correctAnswers = 0;
+		let totalActiveTime = 0;
+		let questionStartTime;
+		let profile = {
+			totalTests: 0,
+			randomTests: 0,
+			unseenTests: 0,
+			infiniteTests: 0,
+			seenQuestions: 0,
+			unseenQuestions: 0,
+			availableQuestions: 0,
+			totalTime: 0,
+		};
+
+		loadQuestions();
+		loadProfile();
+
+		document
+			.getElementById("questionCount")
+			.addEventListener("change", updateEstimatedTime);
+
+		function loadQuestions() {
+			const storedQuestions = JSON.parse(
+				localStorage.getItem("questions")
+			);
+			if (storedQuestions) {
+				questions = storedQuestions;
+			}
+			updateProfileStats();
+			toggleUnseenButton();
+		}
+
+		function saveQuestions() {
+			localStorage.setItem("questions", JSON.stringify(questions));
+		}
+
+		function loadProfile() {
+			const storedProfile = JSON.parse(
+				localStorage.getItem("profile")
+			);
+			if (storedProfile) {
+				profile = storedProfile;
+			}
+		}
+
+		function saveProfile() {
+			localStorage.setItem("profile", JSON.stringify(profile));
+		}
+
+		function updateProfileStats() {
+			profile.seenQuestions = questions.filter((q) => q.seen).length;
+			profile.unseenQuestions = questions.filter(
+				(q) => !q.seen
+			).length;
+			profile.availableQuestions = questions.length;
+		}
+		document.getElementById("refreshHeader").addEventListener("click", function () {
+			window.location.reload();
+		});
+
+
+		function updateEstimatedTime() {
+			const count = parseInt(
+				document.getElementById("questionCount").value
+			);
+			const warning = document.getElementById("selectionWarning");
+			const buttons = [
+				"randomButton",
+				"unseenButton",
+				"infiniteButton",
+			];
+
+			if (isNaN(count)) {
+				document.getElementById("estimatedTime").textContent =
+					"Tempo estimado: -";
+				warning.style.display = "block";
+				buttons.forEach(
+					(buttonId) =>
+						(document.getElementById(buttonId).disabled = true)
+				);
+			} else {
+				const estimatedTime = Math.ceil((count * 90) / 60);
+				document.getElementById(
+					"estimatedTime"
+				).textContent = `Tempo estimado: ${estimatedTime} minutos`;
+				warning.style.display = "none";
+				buttons.forEach(
+					(buttonId) =>
+						(document.getElementById(buttonId).disabled = false)
+				);
+			}
+		}
+
+		function toggleUnseenButton() {
+			const unseenButton = document.getElementById("unseenButton");
+			if (profile.unseenQuestions === 0) {
+				unseenButton.disabled = true;
+				unseenButton.textContent = "Sem Perguntas Novas";
+			} else {
+				unseenButton.disabled = false;
+				unseenButton.textContent = "Perguntas Novas";
+			}
+		}
+
+		function startGame(mode) {
+			const questionCountElement =
+				document.getElementById("questionCount");
+			const questionCount = parseInt(questionCountElement.value);
+			if (isNaN(questionCount)) {
+				alert(
+					"Por favor, selecione o número de perguntas antes de iniciar o jogo."
+				);
+				return;
+			}
+
+			currentQuestions = getQuestions(mode, questionCount);
+			if (currentQuestions.length === 0 && mode === "unseen") {
+				alert("Não há mais perguntas novas disponíveis!");
+				resetGame();
+				return;
+			}
+
+			currentQuestionIndex = 0;
+			correctAnswers = 0;
+			totalActiveTime = 0;
+			resetUI();
+			document.getElementById("menu").classList.add("hidden");
+			document.getElementById("game").classList.remove("hidden");
+
+			profile.totalTests++;
+			if (mode === "random") profile.randomTests++;
+			if (mode === "unseen") profile.unseenTests++;
+			if (mode === "infinite") profile.infiniteTests++;
+			saveProfile();
+
+			showQuestion();
+		}
+
+		function getQuestions(mode, count) {
+			if (mode === "random") {
+				return questions
+					.sort(() => Math.random() - 0.5)
+					.slice(0, count);
+			} else if (mode === "unseen") {
+				const unseen = questions.filter((q) => !q.seen);
+				updateProfileStats();
+				return unseen.slice(0, count);
+			} else if (mode === "infinite") {
+				return [...questions];
+			}
+		}
+
+		function resetUI() {
+			document.getElementById("feedback").classList.add("hidden");
+			document.getElementById("reference").classList.add("hidden");
+			document.getElementById("next").classList.add("hidden");
+		}
+
+
+		function showQuestion() {
+			const question = currentQuestions[currentQuestionIndex];
+			document.getElementById("question").textContent = question.question;
+
+			const optionsDiv = document.getElementById("options");
+			optionsDiv.innerHTML = "";
+
+			const shuffledIndexes = question.options.map((_, index) => index).sort(() => Math.random() - 0.5);
+
+			questionStartTime = Date.now();
+
+			shuffledIndexes.forEach((index) => {
+				const button = document.createElement("button");
+				button.textContent = question.options[index];
+				button.className = "option";
+				button.onclick = () => checkAnswer(index, button);
+				optionsDiv.appendChild(button);
+			});
+		}
+
+
+
+		function checkAnswer(selectedIndex, button) {
+			const question = currentQuestions[currentQuestionIndex];
+			const feedbackDiv = document.getElementById("feedback");
+
+			if (selectedIndex === question.answer) {
+				const timeTaken = (Date.now() - questionStartTime) / 1000;
+				profile.totalTime += timeTaken;
+				feedbackDiv.textContent = `Correto! ${question.explanation}`;
+				feedbackDiv.className = "feedback correct";
+				button.classList.add("correct");
+				document.getElementById(
+					"reference"
+				).textContent = `Referência: ${question.reference}`;
+				document
+					.getElementById("reference")
+					.classList.remove("hidden");
+				correctAnswers++;
+				document.getElementById("next").classList.remove("hidden");
+				question.seen = true;
+				saveQuestions();
+				toggleUnseenButton();
+				disableAllOptions();
+			} else {
+				feedbackDiv.textContent = `Errado! Tente novamente.`;
+				feedbackDiv.className = "feedback wrong";
+				button.classList.add("wrong");
+			}
+
+			feedbackDiv.classList.remove("hidden");
+		}
+
+		function disableAllOptions() {
+			const options = document.querySelectorAll(".option");
+			options.forEach((option) => (option.disabled = true));
+		}
+
+		function nextQuestion() {
+			currentQuestionIndex++;
+			if (currentQuestionIndex < currentQuestions.length) {
+				resetUI();
+				showQuestion();
+			} else {
+				endGame();
+			}
+		}
+
+		function endGame() {
+			document.getElementById("game").classList.add("hidden");
+			document.getElementById("results").classList.remove("hidden");
+			document.getElementById(
+				"score"
+			).textContent = `Pontuação: ${correctAnswers}/${currentQuestions.length}`;
+			updateProfileStats();
+			saveProfile();
+		}
+
+		function resetGame() {
+			document.getElementById("menu").classList.remove("hidden");
+			document.getElementById("game").classList.add("hidden");
+			document.getElementById("results").classList.add("hidden");
+			document.getElementById("list").classList.add("hidden");
+			document.getElementById("profile").classList.add("hidden");
+		}
+
+		function listQuestions() {
+			document.getElementById("menu").classList.add("hidden");
+			document.getElementById("list").classList.remove("hidden");
+			const listDiv = document.getElementById("questionsList");
+			listDiv.innerHTML = "";
+			questions.forEach((q, index) => {
+				const item = document.createElement("div");
+				item.className = "list-item";
+
+				item.innerHTML = `<strong>${index + 1}. </strong>`;
+
+				const questionText = document.createElement('div');
+				questionText.textContent = q.question;
+				item.appendChild(questionText);
+
+				item.innerHTML += `<br>Resposta: ${q.options[q.answer]}<br>Explicação: ${q.explanation}<br>Referência: ${q.reference}<br>`;
+
+				listDiv.appendChild(item);
+			});
+		}
+
+
+		function filterQuestions() {
+			const query = document
+				.getElementById("search")
+				.value.toLowerCase();
+			const listDiv = document.getElementById("questionsList");
+			listDiv.innerHTML = "";
+
+			questions
+				.filter((q) => q.question.toLowerCase().includes(query))
+				.forEach((q, index) => {
+					const item = document.createElement("div");
+					item.className = "list-item";
+
+					const questionNumber = document.createElement("strong");
+					questionNumber.textContent = `${index + 1}. `;
+					item.appendChild(questionNumber);
+
+					const questionText = document.createElement("div");
+					questionText.textContent = q.question;
+					item.appendChild(questionText);
+
+					const answerText = document.createElement("div");
+					answerText.textContent = `Resposta: ${q.options[q.answer]}`;
+					item.appendChild(answerText);
+
+					const explanationText = document.createElement("div");
+					explanationText.textContent = `Explicação: ${q.explanation}`;
+					item.appendChild(explanationText);
+
+					const referenceText = document.createElement("div");
+					referenceText.textContent = `Referência: ${q.reference}`;
+					item.appendChild(referenceText);
+
+					listDiv.appendChild(item);
+				});
+		}
+
+
+		function showProfile() {
+			document.getElementById("menu").classList.add("hidden");
+			document.getElementById("profile").classList.remove("hidden");
+
+			const avgTime = (
+				profile.totalTime / (profile.totalTests || 1)
+			).toFixed(2);
+			document.getElementById(
+				"averageTime"
+			).textContent = `Tempo médio de resposta: ${avgTime} segundos`;
+			document.getElementById(
+				"totalTests"
+			).textContent = `Total de testes realizados: ${profile.totalTests}`;
+			document.getElementById(
+				"randomTests"
+			).textContent = `Testes aleatórios: ${profile.randomTests}`;
+			document.getElementById(
+				"unseenTests"
+			).textContent = `Testes de perguntas novas: ${profile.unseenTests}`;
+			document.getElementById(
+				"infiniteTests"
+			).textContent = `Testes infinitos: ${profile.infiniteTests}`;
+			document.getElementById(
+				"seenQuestions"
+			).textContent = `Perguntas vistas: ${profile.seenQuestions}`;
+			document.getElementById(
+				"unseenQuestions"
+			).textContent = `Perguntas por ver: ${profile.unseenQuestions}`;
+			document.getElementById(
+				"availableQuestions"
+			).textContent = `Perguntas disponíveis: ${profile.availableQuestions}`;
+		}
+	</script>
+</body>
+
+</html>
